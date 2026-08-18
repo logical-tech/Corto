@@ -14,8 +14,8 @@ Each PR must solve **one problem** and be easy to review. PRs that are too large
 2. Clone your fork and create a descriptive branch.
 
    ```bash
-   git clone https://github.com/<your-username>/url-shortner.git
-   cd url-shortner
+   git clone https://github.com/<your-username>/Corto.git
+   cd Corto
    git checkout -b fix/short-description
    ```
 
@@ -35,7 +35,7 @@ Each PR must solve **one problem** and be easy to review. PRs that are too large
    bun run build
    ```
 
-6. Push the branch to your fork and open a pull request from `<your-username>:<branch>` to `logical-tech/url-shortner:main`.
+6. Push the branch to your fork and open a pull request from `<your-username>:<branch>` to `logical-tech/Corto:main`.
 
 ## Pull requests
 

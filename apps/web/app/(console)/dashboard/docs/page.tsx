@@ -22,9 +22,9 @@ import { useTranslation } from "react-i18next"
 
 import { useAppUrl } from "@/lib/app-url"
 
-const repositoryUrl = "https://github.com/logical-tech/url-shortner"
+const repositoryUrl = "https://github.com/logical-tech/Corto"
 const localSetupExample = `git clone ${repositoryUrl}.git
-cd url-shortner
+cd Corto
 cp .env.example .env
 bun install --frozen-lockfile
 bun run --cwd apps/api migrate

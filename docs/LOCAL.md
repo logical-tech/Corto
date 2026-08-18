@@ -11,8 +11,8 @@ Corto is a Bun monorepo with a Hono API, a Next.js dashboard, PostgreSQL, and Re
 ## Start the application
 
 ```bash
-git clone https://github.com/logical-tech/url-shortner.git
-cd url-shortner
+git clone https://github.com/logical-tech/Corto.git
+cd Corto
 cp .env.example .env
 bun install --frozen-lockfile
 bun run --cwd apps/api migrate

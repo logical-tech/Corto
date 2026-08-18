@@ -8,7 +8,7 @@ design, and contributions are welcome.
 
 Deploy it with the databases wired up for you:
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/logical-tech/url-shortner)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/logical-tech/Corto)
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/REPLACE_WITH_TEMPLATE_ID)
 
 Render reads [`render.yaml`](render.yaml) and provisions PostgreSQL and a Key
@@ -45,8 +45,8 @@ PostgreSQL and Redis are not part of the root Compose stack. Connect shared inst
 Requires [Bun 1.3.14](https://bun.sh/) plus reachable PostgreSQL and Redis instances.
 
 ```bash
-git clone https://github.com/logical-tech/url-shortner.git
-cd url-shortner
+git clone https://github.com/logical-tech/Corto.git
+cd Corto
 cp .env.example .env
 bun install --frozen-lockfile
 bun run --cwd apps/api migrate
