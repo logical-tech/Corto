@@ -1,6 +1,6 @@
 {
-  "docsTitle": "Documentação do Shorts",
-  "docsDescription": "Execute o Shorts na sua infraestrutura, implante-o em produção ou integre links curtos a partir de scripts e serviços externos.",
+  "docsTitle": "Documentação do Corto",
+  "docsDescription": "Execute o Corto na sua infraestrutura, implante-o em produção ou integre links curtos a partir de scripts e serviços externos.",
   "docsStart": "Comece",
   "docsAuthentication": "Autenticação",
   "docsEndpoints": "Pontos finais",
@@ -28,7 +28,7 @@
   "configureAdvertising": "Configurar página publicitária",
   "docsAdvertising": "Página publicitária",
   "advertisingDescription": "Configure banners AdsTerra, uma contagem ativa apenas quando a página está visível e escolha se ela exibe Continuar para o site ou redireciona automaticamente ao terminar. Cole uma URL invoke.js ou o snippet completo; cada formato pode ser usado uma vez.",
-  "selfHost": "Hospede o Shorts",
+  "selfHost": "Hospede o Corto",
   "selfHostDescription": "Inicie a pilha completa localmente e depois implante o mesmo repositório na sua infraestrutura.",
   "localSetup": "Executar localmente",
   "localSetupDescription": "Use Bun com PostgreSQL e Redis acessíveis a partir da sua máquina.",

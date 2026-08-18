@@ -75,7 +75,7 @@ const fetchDestinationHtml = async (destination: string) => {
     const response = await fetch(current, {
       headers: {
         accept: "text/html,application/xhtml+xml",
-        "user-agent": "Shorts preview bot",
+        "user-agent": "Corto preview bot",
       },
       redirect: "manual",
       signal: AbortSignal.timeout(1500),
@@ -238,7 +238,7 @@ export const renderAdvertisingPage = ({
       ${renderArea("top")}
       ${renderArea("left")}
       <main class="panel">
-        <div class="panel__head"><span class="signal"></span> Shorts</div>
+        <div class="panel__head"><span class="signal"></span> Corto</div>
         <div class="panel__body">
           <h1>La tua destinazione è pronta.</h1>
           ${

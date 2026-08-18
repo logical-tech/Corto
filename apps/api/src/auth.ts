@@ -21,7 +21,7 @@ export const isConfiguredAdmin = (email: string) =>
   email.toLowerCase() === env.ADMIN_EMAIL
 
 export const authOptions = {
-  appName: "Shorts",
+  appName: "Corto",
   baseURL: env.BETTER_AUTH_URL,
   database: drizzleAdapter(db, { provider: "pg", schema }),
   emailAndPassword: { enabled: true },

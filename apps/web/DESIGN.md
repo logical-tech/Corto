@@ -1,5 +1,5 @@
 ---
-name: Shorts
+name: Corto
 description: Un modern routing desk per trasformare URL lunghi in etichette brevi e tracciabili.
 colors:
   paper: "oklch(0.985 0.004 95)"
@@ -77,7 +77,7 @@ components:
     padding: "1.5rem"
 ---
 
-# Design System: Shorts
+# Design System: Corto
 
 ## Overview
 

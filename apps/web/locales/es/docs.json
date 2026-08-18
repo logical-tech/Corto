@@ -1,6 +1,6 @@
 {
-  "docsTitle": "Documentación de Shorts",
-  "docsDescription": "Ejecuta Shorts en tu propia infraestructura, despliégalo en producción o integra enlaces cortos desde scripts y servicios externos.",
+  "docsTitle": "Documentación de Corto",
+  "docsDescription": "Ejecuta Corto en tu propia infraestructura, despliégalo en producción o integra enlaces cortos desde scripts y servicios externos.",
   "docsStart": "empezar",
   "docsAuthentication": "Autenticación",
   "docsEndpoints": "Puntos finales",
@@ -28,7 +28,7 @@
   "configureAdvertising": "Configurar página publicitaria",
   "docsAdvertising": "Página publicitaria",
   "advertisingDescription": "Configura banners AdsTerra, una cuenta atrás activa solo cuando la página está visible y si al final muestra Continuar al sitio o redirige automáticamente. Pega una URL invoke.js o el snippet completo; cada tamaño se usa una sola vez.",
-  "selfHost": "Aloja Shorts por tu cuenta",
+  "selfHost": "Aloja Corto por tu cuenta",
   "selfHostDescription": "Inicia la pila completa en local y después despliega el mismo repositorio en tu infraestructura.",
   "localSetup": "Ejecutar en local",
   "localSetupDescription": "Usa Bun con PostgreSQL y Redis accesibles desde tu equipo.",

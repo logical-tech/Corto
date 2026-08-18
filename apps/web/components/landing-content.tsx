@@ -217,7 +217,7 @@ export function LandingContent() {
             className="overflow-x-auto rounded-2xl bg-foreground p-6 font-mono text-sm leading-7 text-background shadow-xl"
           >
             <code>{`curl -X POST ${apiUrl}/v1/links \\
-  -H "x-api-key: $SHORTS_API_KEY" \\
+  -H "x-api-key: $CORTO_API_KEY" \\
   -H "content-type: application/json" \\
   -d '{"url":"https://example.com/brief"}'`}</code>
           </pre>

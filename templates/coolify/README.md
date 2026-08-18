@@ -1,6 +1,6 @@
 # Coolify template
 
-This Compose file follows Coolify's template metadata format and uses its managed network. It is for a Git-backed **Docker Compose** build pack, not a manually pasted one-click service: Shorts must build its Dockerfile from this repository.
+This Compose file follows Coolify's template metadata format and uses its managed network. It is for a Git-backed **Docker Compose** build pack, not a manually pasted one-click service: Corto must build its Dockerfile from this repository.
 
 1. Create a new resource from the repository.
 2. Choose the Docker Compose build pack.

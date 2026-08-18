@@ -153,7 +153,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <SidebarInset className="h-svh min-h-0 min-w-0 overflow-hidden md:h-auto">
         <header className="sticky top-0 isolate z-30 flex h-14 shrink-0 items-center gap-3 border-b bg-background/95 px-4 shadow-sm supports-backdrop-filter:bg-background/85 supports-backdrop-filter:backdrop-blur-xl sm:px-6">
           <SidebarTrigger />
-          <span className="text-sm font-medium">Shorts</span>
+          <span className="text-sm font-medium">Corto</span>
           <div className="ml-auto flex items-center gap-1">
             <ThemeToggle />
             <LanguageSwitcher />

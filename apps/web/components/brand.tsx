@@ -15,7 +15,7 @@ export function Brand({ href = "/" }: { href?: string }) {
         <span className="absolute right-1.5 size-1.5 rounded-full bg-current" />
         <span className="h-px w-3 bg-current" />
       </span>
-      Shorts
+      Corto
     </Link>
   )
 }

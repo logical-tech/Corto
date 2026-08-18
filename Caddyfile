@@ -13,15 +13,15 @@
 
 	@api path /api /api/*
 	handle @api {
-		reverse_proxy {$API_UPSTREAM:shorts-api:8787}
+		reverse_proxy {$API_UPSTREAM:corto-api:8787}
 	}
 
 	@web path {$WEB_ROUTES:/__no_gui__}
 	handle @web {
-		reverse_proxy {$WEB_UPSTREAM:shorts-api:8787}
+		reverse_proxy {$WEB_UPSTREAM:corto-api:8787}
 	}
 
 	handle {
-		reverse_proxy {$API_UPSTREAM:shorts-api:8787}
+		reverse_proxy {$API_UPSTREAM:corto-api:8787}
 	}
 }

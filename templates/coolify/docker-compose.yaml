@@ -1,8 +1,8 @@
 # documentation: https://github.com/logical-tech/url-shortner/tree/main/docs/COOLIFY.md
-# slogan: A self-hosted URL shortener with analytics, API access, and a dashboard.
+# slogan: Modern open-source URL shortener you can self-host, with link passwords, expiry, click limits, ads, and analytics.
 # category: utilities
 # tags: url-shortener,analytics,api,nextjs,bun
-# logo: svgs/shorts.svg
+# logo: svgs/corto.svg
 # port: 80
 services:
   caddy:
@@ -36,9 +36,9 @@ services:
     environment:
       NODE_ENV: production
       PORT: 8787
-      DATABASE_URL: postgresql://shorts:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/shorts
+      DATABASE_URL: postgresql://corto:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/corto
       REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379
-      REDIS_PREFIX: ${REDIS_PREFIX:-shorts:}
+      REDIS_PREFIX: ${REDIS_PREFIX:-corto:}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL:?BETTER_AUTH_URL is required}
       ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL is required}
@@ -88,13 +88,13 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: shorts
-      POSTGRES_USER: shorts
+      POSTGRES_DB: corto
+      POSTGRES_USER: corto
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     volumes:
-      - shorts-postgres:/var/lib/postgresql/data
+      - corto-postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U shorts -d shorts"]
+      test: ["CMD-SHELL", "pg_isready -U corto -d corto"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -106,7 +106,7 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     volumes:
-      - shorts-redis:/data
+      - corto-redis:/data
     healthcheck:
       test:
         [
@@ -118,5 +118,5 @@ services:
       retries: 5
 
 volumes:
-  shorts-postgres: {}
-  shorts-redis: {}
+  corto-postgres: {}
+  corto-redis: {}

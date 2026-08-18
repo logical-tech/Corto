@@ -1,6 +1,6 @@
 # One-click deploy
 
-Shorts normally runs as three containers (Caddy, API, web) behind one domain.
+Corto normally runs as three containers (Caddy, API, web) behind one domain.
 Hosts that hand you a single web service and a single URL cannot do that, so the
 `Dockerfile` ships an extra **`standalone`** stage: Caddy binds the platform's
 `$PORT` and proxies to the API and the dashboard on loopback inside the same
@@ -39,12 +39,12 @@ pointing at the platform subdomain.
 Click **Deploy to Render** in the README. Render reads [`render.yaml`](../render.yaml)
 and creates three resources wired together:
 
-1. **The `shorts` web service** builds the `standalone` image. Caddy answers on
+1. **The `corto` web service** builds the `standalone` image. Caddy answers on
    Render's `$PORT`; `/api/*` goes to the API, dashboard routes to Next.js, and
    `/<slug>` to the redirect handler.
-2. **`shorts-postgres`** — its connection string is injected as `DATABASE_URL`.
+2. **`corto-postgres`** — its connection string is injected as `DATABASE_URL`.
    The API runs Drizzle migrations before it starts listening.
-3. **`shorts-keyvalue`** — a Valkey (Redis-compatible) store on the private
+3. **`corto-keyvalue`** — a Valkey (Redis-compatible) store on the private
    network, injected as `REDIS_URL`.
 
 You are prompted for one variable: `ADMIN_EMAIL`, the account allowed to manage
@@ -59,7 +59,7 @@ builds the Next.js bundle.
 
 Click **Deploy on Railway** in the README. The template creates:
 
-1. **The Shorts app**, built from [`railway.json`](../railway.json) — the
+1. **The Corto app**, built from [`railway.json`](../railway.json) — the
    `DOCKERFILE` builder produces the same `standalone` image.
 2. **A PostgreSQL database**, referenced as `DATABASE_URL`.
 3. **A Redis database**, referenced as `REDIS_URL`.
@@ -78,15 +78,15 @@ three-container production setup with external databases.
 For a bare VPS the all-in-one image is one command:
 
 ```bash
-docker build -t shorts .
-docker run -d --name shorts -p 80:80 \
+docker build -t corto .
+docker run -d --name corto -p 80:80 \
   -e APP_URL=https://links.example.com \
-  -e DATABASE_URL=postgresql://user:password@host:5432/shorts \
+  -e DATABASE_URL=postgresql://user:password@host:5432/corto \
   -e REDIS_URL=redis://host:6379 \
   -e ADMIN_EMAIL=admin@example.com \
   -e BETTER_AUTH_SECRET="$(openssl rand -base64 32)" \
   -e IP_HASH_SECRET="$(openssl rand -base64 32)" \
-  shorts
+  corto
 ```
 
 Put your own TLS-terminating proxy in front of it and keep `TRUST_PROXY=true`
@@ -102,7 +102,7 @@ Put your own TLS-terminating proxy in front of it and keep `TRUST_PROXY=true`
 | `BETTER_AUTH_SECRET` | Yes      | At least 32 characters. Changing it invalidates all sessions. |
 | `IP_HASH_SECRET`     | No       | Defaults to `BETTER_AUTH_SECRET`. A separate value is better. |
 | `APP_URL`            | No       | Falls back to the platform URL. Set it for a custom domain.   |
-| `REDIS_PREFIX`       | No       | `shorts:`. Must be unique when Redis is shared.               |
+| `REDIS_PREFIX`       | No       | `corto:`. Must be unique when Redis is shared.                |
 | `TRUST_PROXY`        | No       | `true`. Set `false` only when nothing proxies the container.  |
 | `PASSKEY_RP_ID`      | No       | Your domain, to enable passkeys. Empty disables them safely.  |
 

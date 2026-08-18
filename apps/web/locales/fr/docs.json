@@ -1,6 +1,6 @@
 {
-  "docsTitle": "Documentation de Shorts",
-  "docsDescription": "Exécutez Shorts sur votre infrastructure, déployez-le en production ou intégrez des liens courts depuis des scripts et services externes.",
+  "docsTitle": "Documentation de Corto",
+  "docsDescription": "Exécutez Corto sur votre infrastructure, déployez-le en production ou intégrez des liens courts depuis des scripts et services externes.",
   "docsStart": "Commencer",
   "docsAuthentication": "Authentification",
   "docsEndpoints": "Points de terminaison",
@@ -28,7 +28,7 @@
   "configureAdvertising": "Configurer la page publicitaire",
   "docsAdvertising": "Page publicitaire",
   "advertisingDescription": "Configurez les bannières AdsTerra, un compte à rebours actif uniquement lorsque la page est visible, puis choisissez entre afficher Continuer vers le site ou rediriger automatiquement. Collez une URL invoke.js ou l’extrait complet ; chaque format est utilisable une fois.",
-  "selfHost": "Héberger Shorts vous-même",
+  "selfHost": "Héberger Corto vous-même",
   "selfHostDescription": "Démarrez la pile complète en local, puis déployez le même dépôt sur votre infrastructure.",
   "localSetup": "Exécuter en local",
   "localSetupDescription": "Utilisez Bun avec PostgreSQL et Redis accessibles depuis votre machine.",

@@ -39,7 +39,7 @@ Users create and manage links in a signed-in console or from CI, scripts and thi
 
 ## Brand Commitments
 
-“Shorts” is a working product name derived from the repository and may be replaced. The requested tone is modern, minimal and approachable, with the simplicity of Kinde authentication surfaces.
+“Corto” is the product name. The requested tone is modern, minimal and approachable, with the simplicity of Kinde authentication surfaces.
 
 ## Evidence on Hand
 

@@ -1,6 +1,6 @@
 {
-  "docsTitle": "Shorts ドキュメント",
-  "docsDescription": "Shorts を自分のインフラで実行し、本番環境へデプロイするか、スクリプトや外部サービスから短縮リンクを連携します。",
+  "docsTitle": "Corto ドキュメント",
+  "docsDescription": "Corto を自分のインフラで実行し、本番環境へデプロイするか、スクリプトや外部サービスから短縮リンクを連携します。",
   "docsStart": "始めましょう",
   "docsAuthentication": "認証",
   "docsEndpoints": "エンドポイント",
@@ -28,7 +28,7 @@
   "configureAdvertising": "広告ページを設定",
   "docsAdvertising": "広告ページ",
   "advertisingDescription": "AdsTerra バナー、ページ表示中のみ進むカウントダウン、終了時に「サイトへ進む」を表示するか自動リダイレクトするかを設定します。invoke.js URL または完全なスニペットを貼り付けます。各サイズは一度だけ使用できます。",
-  "selfHost": "Shorts をセルフホスト",
+  "selfHost": "Corto をセルフホスト",
   "selfHostDescription": "ローカルで完全なスタックを起動してから、同じリポジトリを自身のインフラへデプロイします。",
   "localSetup": "ローカルで実行",
   "localSetupDescription": "マシンから到達できる PostgreSQL と Redis で Bun を使用します。",

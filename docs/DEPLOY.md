@@ -14,7 +14,7 @@ For a self-contained stack with PostgreSQL and Redis volumes, use [`templates/do
 ## 1. Prepare infrastructure and DNS
 
 1. Create a dedicated PostgreSQL database and user. If Dokploy manages it, copy its **Internal Connection URL** from the database Connection page.
-2. Choose a Redis database, copy its internal URL, and use a unique prefix such as `acme-shorts:`. Do not share a prefix with another application.
+2. Choose a Redis database, copy its internal URL, and use a unique prefix such as `acme-corto:`. Do not share a prefix with another application.
 3. Point one DNS record, for example `links.example.com`, at Dokploy. The dashboard, API, and short URLs share one domain.
 4. Generate two different secrets:
 
@@ -40,7 +40,7 @@ Copy `.env.example` into Dokploy's Environment editor and replace every value. U
 | --------------------- | -------------------------------- | -------------------------------------------------------------- |
 | `DATABASE_URL`        | Internal URL copied from Dokploy | Never use `localhost` or an invented hostname.                 |
 | `REDIS_URL`           | Internal URL copied from Dokploy | Use `rediss://` only when the internal connection enables TLS. |
-| `REDIS_PREFIX`        | `acme-shorts:`                   | Must be unique in shared Redis.                                |
+| `REDIS_PREFIX`        | `acme-corto:`                    | Must be unique in shared Redis.                                |
 | `BETTER_AUTH_SECRET`  | `openssl rand -base64 32` output | At least 32 characters; preserve it across deployments.        |
 | `BETTER_AUTH_URL`     | `https://links.example.com`      | Canonical public origin used by Better Auth.                   |
 | `ADMIN_EMAIL`         | `admin@example.com`              | The account allowed to manage global settings.                 |
@@ -50,7 +50,7 @@ Copy `.env.example` into Dokploy's Environment editor and replace every value. U
 | `CORS_ORIGINS`        | `https://links.example.com`      | Exact comma-separated origins, without paths.                  |
 | `TRUST_PROXY`         | `true`                           | Only behind Dokploy, Traefik, or another trusted proxy.        |
 | `PASSKEY_RP_ID`       | `links.example.com`              | Optional. Leave empty to safely disable passkeys.              |
-| `PASSKEY_RP_NAME`     | `Shorts`                         | Name shown by the passkey manager.                             |
+| `PASSKEY_RP_NAME`     | `Corto`                          | Name shown by the passkey manager.                             |
 | `PASSKEY_ORIGIN`      | `https://links.example.com`      | Optional; defaults to `BETTER_AUTH_URL`.                       |
 | `DOCKER_NETWORK`      | `dokploy-network`                | External network shared with Dokploy services.                 |
 
@@ -73,7 +73,7 @@ The first command returns HTTP 200. The second returns a redirect without creati
 ## Routing, CORS, and cookies
 
 - Dokploy forwards the domain to Caddy. Caddy routes `/api/*` to `api:8787`, known GUI routes to `web:3000`, and `/<slug>` to `api:8787`.
-- Caddy, API, and web use the external `DOCKER_NETWORK`; Caddy reaches the unique aliases `shorts-api` and `shorts-web`, avoiding collisions with other services called `api` or `web`.
+- Caddy, API, and web use the external `DOCKER_NETWORK`; Caddy reaches the unique aliases `corto-api` and `corto-web`, avoiding collisions with other services called `api` or `web`.
 - In API-only mode, `/` returns `404`; the API stays at `/api/*` and short-link redirects at `/<slug>`.
 - Your proxy must forward `X-Forwarded-For`, `X-Forwarded-Host`, and `X-Forwarded-Proto`. Enable `TRUST_PROXY=true` only behind a trusted proxy.
 - `CORS_ORIGINS` contains exact origins such as `https://links.example.com`, without `/api`.
@@ -87,8 +87,8 @@ The first command returns HTTP 200. The second returns a redirect without creati
 4. An image rollback does not undo destructive migrations. Follow the migration rollback procedure or restore PostgreSQL from a verified backup.
 
 ```bash
-pg_dump --format=custom --no-owner "$DATABASE_URL" > "shorts-$(date +%F-%H%M).dump"
-pg_restore --clean --if-exists --no-owner --dbname "$DATABASE_URL" shorts-YYYY-MM-DD-HHMM.dump
+pg_dump --format=custom --no-owner "$DATABASE_URL" > "corto-$(date +%F-%H%M).dump"
+pg_restore --clean --if-exists --no-owner --dbname "$DATABASE_URL" corto-YYYY-MM-DD-HHMM.dump
 ```
 
 Restores are destructive; test them on a separate database first. Redis is cache-only in the root deployment and can be repopulated from PostgreSQL.

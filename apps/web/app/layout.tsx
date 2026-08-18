@@ -9,7 +9,7 @@ import { SkipToContent } from "@/components/skip-to-content"
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
 const themeScript = `(() => {
   try {
-    const savedTheme = localStorage.getItem("shorts.theme")
+    const savedTheme = localStorage.getItem("corto.theme")
     const isDark = savedTheme
       ? savedTheme === "dark"
       : matchMedia("(prefers-color-scheme: dark)").matches
@@ -28,12 +28,12 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Shorts — short links, clear analytics",
-    template: "%s · Shorts",
+    default: "Corto — short links that stay yours",
+    template: "%s · Corto",
   },
   description:
-    "Create short links, track clicks, and manage everything from the dashboard or API. Built for simple self-hosting.",
-  applicationName: "Shorts",
+    "A modern, open-source URL shortener you can self-host. Link passwords, expiry dates, click limits, your own ads, and analytics — from the dashboard or the API.",
+  applicationName: "Corto",
   keywords: [
     "URL shortener",
     "short link",
@@ -41,30 +41,31 @@ export const metadata: Metadata = {
     "link analytics",
     "API",
     "self-hosted",
+    "open source",
   ],
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "/",
-    siteName: "Shorts",
-    title: "Shorts — short links, clear analytics",
+    siteName: "Corto",
+    title: "Corto — short links that stay yours",
     description:
-      "Create, share, and measure short links from the dashboard or API.",
+      "Open-source, self-hosted URL shortener with link passwords, expiry, click limits, ads, and analytics.",
     images: [
       {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Shorts, from long URL to trackable short link",
+        alt: "Corto, from long URL to trackable short link",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Shorts — short links, clear analytics",
+    title: "Corto — short links that stay yours",
     description:
-      "Create, share, and measure short links from the dashboard or API.",
+      "Open-source, self-hosted URL shortener with link passwords, expiry, click limits, ads, and analytics.",
     images: ["/opengraph-image"],
   },
 }

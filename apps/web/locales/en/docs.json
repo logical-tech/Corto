@@ -1,6 +1,6 @@
 {
-  "docsTitle": "Shorts documentation",
-  "docsDescription": "Run Shorts yourself, deploy it to your infrastructure, or integrate short links from scripts and external services.",
+  "docsTitle": "Corto documentation",
+  "docsDescription": "Run Corto yourself, deploy it to your infrastructure, or integrate short links from scripts and external services.",
   "docsStart": "Get started",
   "docsAuthentication": "Authentication",
   "docsEndpoints": "Endpoints",
@@ -28,7 +28,7 @@
   "configureAdvertising": "Configure advertising interstitial",
   "docsAdvertising": "Advertising interstitial",
   "advertisingDescription": "Configure AdsTerra banners, a visible-only countdown, and whether its end reveals Continue to site or redirects automatically. Paste an invoke.js URL or the complete copied snippet; each banner size can be used once.",
-  "selfHost": "Self-host Shorts",
+  "selfHost": "Self-host Corto",
   "selfHostDescription": "Start the full stack locally, then move the same repository to your production infrastructure.",
   "localSetup": "Run locally",
   "localSetupDescription": "Use Bun with PostgreSQL and Redis you can reach from your machine.",

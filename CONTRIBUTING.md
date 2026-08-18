@@ -1,6 +1,6 @@
-# Contributing to Shorts
+# Contributing to Corto
 
-Thanks for helping improve Shorts. We welcome contributions to code, documentation, tests, and translations.
+Thanks for helping improve Corto. We welcome contributions to code, documentation, tests, and translations.
 
 ## The main rule: fork and keep PRs small
 

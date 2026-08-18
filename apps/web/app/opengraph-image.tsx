@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og"
 
-export const alt = "Shorts, dal link lungo allo short link tracciabile"
+export const alt = "Corto, from long URL to trackable short link"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -43,7 +43,7 @@ export default function OpenGraphImage() {
               width: 42,
             }}
           />
-          Shorts
+          Corto
         </div>
         <div
           style={{

@@ -6,7 +6,7 @@ export const parseEnv = (input: NodeJS.ProcessEnv) =>
       PORT: z.coerce.number().int().min(1).max(65_535).default(8787),
       DATABASE_URL: z.string().min(1),
       REDIS_URL: z.string().min(1),
-      REDIS_PREFIX: z.string().trim().min(1).default("shorts:"),
+      REDIS_PREFIX: z.string().trim().min(1).default("corto:"),
       BETTER_AUTH_SECRET: z.string().min(32),
       BETTER_AUTH_URL: z.string().url(),
       ADMIN_EMAIL: z
@@ -41,7 +41,7 @@ export const parseEnv = (input: NodeJS.ProcessEnv) =>
         .map((origin) => origin.trim())
         .filter(Boolean),
       PASSKEY_ENABLED: Boolean(value.PASSKEY_RP_ID),
-      PASSKEY_RP_NAME: value.PASSKEY_RP_NAME || "Shorts",
+      PASSKEY_RP_NAME: value.PASSKEY_RP_NAME || "Corto",
       PASSKEY_ORIGIN: (value.PASSKEY_ORIGIN || value.BETTER_AUTH_URL).replace(
         /\/$/,
         ""

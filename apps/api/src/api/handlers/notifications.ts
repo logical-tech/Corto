@@ -26,7 +26,7 @@ export const notifyGoalMilestones = async ({
 
   const shortUrl = `${env.SHORT_URL_BASE}/${slug}`;
   const goals = milestones.map(({ clicks }) => `${clicks} click`).join(", ");
-  const text = `Shorts milestone reached: ${shortUrl} reached ${goals}.`;
+  const text = `Corto milestone reached: ${shortUrl} reached ${goals}.`;
   const notifications = [
     settings.discordWebhookUrl
       ? request(settings.discordWebhookUrl, {

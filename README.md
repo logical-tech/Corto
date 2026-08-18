@@ -1,6 +1,10 @@
-# Shorts
+# Corto
 
-Self-hosted URL shortener with fast Redis redirects, PostgreSQL analytics, a Hono/Bun API, and a Next.js dashboard.
+**A modern URL shortener that stays yours.** Free, open source, and easy to
+self-host in several ways. Password-protect a link, give it an expiry date or a
+click limit, run your own ads on it, and read the analytics from the dashboard —
+or skip the dashboard entirely and drive everything through the API. Secure by
+design, and contributions are welcome.
 
 Deploy it with the databases wired up for you:
 
@@ -32,7 +36,7 @@ PostgreSQL and Redis plus Bun's password hashing. [Why](docs/ONE-CLICK.md#why-no
 - `apps/web`: landing page, dashboard, analytics, and API documentation in Next.js. Port `3000`.
 - `Caddyfile`: the only HTTP entrypoint on port `80`; proxies `/api/*` to the API, GUI routes to Next.js, and `/<slug>` to the API.
 - `packages/ui`: shared shadcn/ui components.
-- PostgreSQL stores users, links, API keys, and events. Redis uses `REDIS_PREFIX` (default `shorts:`) for cache and redirects.
+- PostgreSQL stores users, links, API keys, and events. Redis uses `REDIS_PREFIX` (default `corto:`) for cache and redirects.
 
 PostgreSQL and Redis are not part of the root Compose stack. Connect shared instances with `DATABASE_URL` and `REDIS_URL`. In Dokploy, all root services use `DOCKER_NETWORK` (default `dokploy-network`) and unique aliases to avoid DNS collisions with other projects.
 
@@ -59,7 +63,7 @@ The web app exposes a guide at `/docs`; the public machine-readable schema is `/
 
 ```bash
 curl -X POST "$NEXT_PUBLIC_APP_URL/api/v1/links" \
-  -H "x-api-key: $SHORTS_API_KEY" \
+  -H "x-api-key: $CORTO_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url":"https://example.com/guide","slug":"guide"}'
 ```

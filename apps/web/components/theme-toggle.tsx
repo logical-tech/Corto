@@ -4,7 +4,7 @@ import { Button } from "@workspace/ui/components/button"
 import { MoonIcon, SunIcon } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
-const themeStorageKey = "shorts.theme"
+const themeStorageKey = "corto.theme"
 
 export function ThemeToggle() {
   const { t } = useTranslation("common")

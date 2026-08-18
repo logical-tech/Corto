@@ -16,7 +16,7 @@ import { openapi } from "./openapi"
 Object.assign(process.env, {
   DATABASE_URL: "postgresql://test:test@127.0.0.1:1/test",
   REDIS_URL: "redis://127.0.0.1:1",
-  REDIS_PREFIX: "shared:shorts:",
+  REDIS_PREFIX: "shared:corto:",
   BETTER_AUTH_SECRET: "test-secret-that-is-at-least-32-characters-long",
   BETTER_AUTH_URL: "http://localhost:8787",
   ADMIN_EMAIL: "admin@example.com",

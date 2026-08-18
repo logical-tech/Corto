@@ -1,6 +1,6 @@
-# Run Shorts locally
+# Run Corto locally
 
-Shorts is a Bun monorepo with a Hono API, a Next.js dashboard, PostgreSQL, and Redis. PostgreSQL and Redis are external services; the repository does not start them for you.
+Corto is a Bun monorepo with a Hono API, a Next.js dashboard, PostgreSQL, and Redis. PostgreSQL and Redis are external services; the repository does not start them for you.
 
 ## Requirements
 
@@ -22,7 +22,7 @@ bun run dev
 Update `.env` with reachable PostgreSQL and Redis URLs before starting the application. The defaults expect services on your machine:
 
 ```dotenv
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/shorts
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/corto
 REDIS_URL=redis://localhost:6379
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 BETTER_AUTH_URL=http://localhost:3000

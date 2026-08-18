@@ -4,7 +4,7 @@
 # the single port Render exposes.
 services:
   - type: web
-    name: shorts
+    name: corto
     runtime: docker
     plan: starter
     dockerfilePath: ./Dockerfile
@@ -21,28 +21,28 @@ services:
       - key: IP_HASH_SECRET
         generateValue: true
       - key: REDIS_PREFIX
-        value: "shorts:"
+        value: "corto:"
       - key: TRUST_PROXY
         value: "true"
       - key: DATABASE_URL
         fromDatabase:
-          name: shorts-postgres
+          name: corto-postgres
           property: connectionString
       - key: REDIS_URL
         fromService:
-          name: shorts-keyvalue
+          name: corto-keyvalue
           type: keyvalue
           property: connectionString
 
   - type: keyvalue
-    name: shorts-keyvalue
+    name: corto-keyvalue
     plan: starter
     # Redirect caches only; PostgreSQL stays authoritative.
     maxmemoryPolicy: allkeys-lru
     ipAllowList: []
 
 databases:
-  - name: shorts-postgres
-    databaseName: shorts
-    user: shorts
+  - name: corto-postgres
+    databaseName: corto
+    user: corto
     plan: basic-256mb

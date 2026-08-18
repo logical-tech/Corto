@@ -1,6 +1,6 @@
 {
-  "docsTitle": "Shorts-Dokumentation",
-  "docsDescription": "Betreiben Sie Shorts selbst, stellen Sie es auf Ihrer Infrastruktur bereit oder integrieren Sie Kurzlinks aus Skripten und externen Diensten.",
+  "docsTitle": "Corto-Dokumentation",
+  "docsDescription": "Betreiben Sie Corto selbst, stellen Sie es auf Ihrer Infrastruktur bereit oder integrieren Sie Kurzlinks aus Skripten und externen Diensten.",
   "docsStart": "Fangen Sie an",
   "docsAuthentication": "Authentifizierung",
   "docsEndpoints": "Endpunkte",
@@ -28,7 +28,7 @@
   "configureAdvertising": "Werbe-Zwischenseite konfigurieren",
   "docsAdvertising": "Werbe-Zwischenseite",
   "advertisingDescription": "Konfigurieren Sie AdsTerra-Banner, einen nur bei sichtbarer Seite laufenden Countdown und ob danach Weiter zur Website erscheint oder automatisch weitergeleitet wird. Fügen Sie eine invoke.js-URL oder den vollständigen Snippet ein; jede Bannergröße kann einmal verwendet werden.",
-  "selfHost": "Shorts selbst hosten",
+  "selfHost": "Corto selbst hosten",
   "selfHostDescription": "Starten Sie den vollständigen Stack lokal und stellen Sie dasselbe Repository anschließend auf Ihrer Infrastruktur bereit.",
   "localSetup": "Lokal ausführen",
   "localSetupDescription": "Verwenden Sie Bun mit PostgreSQL und Redis, die von Ihrem Rechner erreichbar sind.",

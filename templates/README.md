@@ -1,6 +1,6 @@
 # Deployment templates
 
-The templates in this directory deploy Shorts from this repository. They intentionally build the existing multi-stage `Dockerfile`; no unpublished container image is required.
+The templates in this directory deploy Corto from this repository. They intentionally build the existing multi-stage `Dockerfile`; no unpublished container image is required.
 
 | Platform | Compose file                                                 | How to use it                                                                                                  |
 | -------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |

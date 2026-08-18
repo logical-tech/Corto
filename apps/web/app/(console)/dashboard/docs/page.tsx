@@ -42,13 +42,13 @@ export function DocumentationContent() {
   const { t } = useTranslation("docs")
   const apiUrl = `${useAppUrl()}/api`
   const authenticationExample = `curl ${apiUrl}/v1/links \\
-  -H "x-api-key: $SHORTS_API_KEY"`
+  -H "x-api-key: $CORTO_API_KEY"`
   const createExample = `curl -X POST ${apiUrl}/v1/links \\
-  -H "x-api-key: $SHORTS_API_KEY" \\
+  -H "x-api-key: $CORTO_API_KEY" \\
   -H "content-type: application/json" \\
   -d '{"url":"https://example.com/catalog"}'`
   const advertisingExample = `curl -X PATCH ${apiUrl}/v1/advertising \\
-  -H "x-api-key: $SHORTS_API_KEY" \\
+  -H "x-api-key: $CORTO_API_KEY" \\
   -H "content-type: application/json" \\
   -d '{"enabled":true,"automaticRedirect":false,"delaySeconds":5,"banners":[{"preset":"320x50","script":"https://www.highperformanceformat.com/<key>/invoke.js"}]}'`
   const endpoints = [

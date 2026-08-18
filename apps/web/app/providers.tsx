@@ -17,9 +17,9 @@ function LocaleSync() {
         ? language
         : defaultLocale
       document.documentElement.lang = locale
-      window.localStorage.setItem("shorts.locale", locale)
+      window.localStorage.setItem("corto.locale", locale)
     }
-    const savedLocale = window.localStorage.getItem("shorts.locale")
+    const savedLocale = window.localStorage.getItem("corto.locale")
 
     i18n.on("languageChanged", syncDocumentLanguage)
     if (

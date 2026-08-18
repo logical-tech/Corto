@@ -1,6 +1,6 @@
 {
-  "docsTitle": "Shorts 文档",
-  "docsDescription": "在自己的基础设施上运行 Shorts、将其部署到生产环境，或从脚本和外部服务集成短链接。",
+  "docsTitle": "Corto 文档",
+  "docsDescription": "在自己的基础设施上运行 Corto、将其部署到生产环境，或从脚本和外部服务集成短链接。",
   "docsStart": "开始使用",
   "docsAuthentication": "认证",
   "docsEndpoints": "端点",
@@ -28,7 +28,7 @@
   "configureAdvertising": "配置广告过渡页",
   "docsAdvertising": "广告过渡页",
   "advertisingDescription": "配置 AdsTerra 横幅、仅在页面可见时运行的倒计时，并选择结束时显示继续前往网站还是自动跳转。粘贴 invoke.js URL 或完整代码片段；每个尺寸只能使用一次。",
-  "selfHost": "自行托管 Shorts",
+  "selfHost": "自行托管 Corto",
   "selfHostDescription": "先在本地启动完整堆栈，再将同一仓库部署到您的基础设施上。",
   "localSetup": "本地运行",
   "localSetupDescription": "通过可从您的机器访问的 PostgreSQL 和 Redis 使用 Bun。",

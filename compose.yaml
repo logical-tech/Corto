@@ -1,21 +1,21 @@
-name: shorts
+name: corto
 
 services:
   caddy:
-    image: ${CADDY_IMAGE:-shorts-caddy:latest}
+    image: ${CADDY_IMAGE:-corto-caddy:latest}
     build:
       context: .
       target: caddy
     restart: unless-stopped
     environment:
-      API_UPSTREAM: shorts-api:8787
-      WEB_UPSTREAM: shorts-web:3000
+      API_UPSTREAM: corto-api:8787
+      WEB_UPSTREAM: corto-web:3000
       WEB_ROUTES: "/ /login /login/* /register /register/* /two-factor /two-factor/* /account /account/* /users /users/* /dashboard /dashboard/* /links /links/* /api-keys /api-keys/* /settings /settings/* /docs /docs/* /_next/* /robots.txt /sitemap.xml /opengraph-image /favicon.ico"
     expose:
       - "80"
     networks:
       default:
-        aliases: [shorts-caddy]
+        aliases: [corto-caddy]
     depends_on:
       api:
         condition: service_healthy
@@ -31,7 +31,7 @@ services:
       retries: 5
 
   api:
-    image: ${API_IMAGE:-shorts-api:latest}
+    image: ${API_IMAGE:-corto-api:latest}
     build:
       context: .
       target: api
@@ -41,7 +41,7 @@ services:
       PORT: 8787
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
       REDIS_URL: ${REDIS_URL:?REDIS_URL is required}
-      REDIS_PREFIX: ${REDIS_PREFIX:-shorts:}
+      REDIS_PREFIX: ${REDIS_PREFIX:-corto:}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL:?BETTER_AUTH_URL is required}
       ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL is required}
@@ -50,22 +50,28 @@ services:
       TRUST_PROXY: ${TRUST_PROXY:-true}
       CORS_ORIGINS: ${CORS_ORIGINS:?CORS_ORIGINS is required}
       PASSKEY_RP_ID: ${PASSKEY_RP_ID:-}
-      PASSKEY_RP_NAME: ${PASSKEY_RP_NAME:-Shorts}
+      PASSKEY_RP_NAME: ${PASSKEY_RP_NAME:-Corto}
       PASSKEY_ORIGIN: ${PASSKEY_ORIGIN:-}
     expose:
       - "8787"
     networks:
       default:
-        aliases: [shorts-api]
+        aliases: [corto-api]
     healthcheck:
-      test: ["CMD", "bun", "-e", "const r=await fetch('http://127.0.0.1:8787/api/health');if(!r.ok)process.exit(1)"]
+      test:
+        [
+          "CMD",
+          "bun",
+          "-e",
+          "const r=await fetch('http://127.0.0.1:8787/api/health');if(!r.ok)process.exit(1)",
+        ]
       interval: 15s
       timeout: 5s
       start_period: 10s
       retries: 5
 
   web:
-    image: ${WEB_IMAGE:-shorts-web:latest}
+    image: ${WEB_IMAGE:-corto-web:latest}
     build:
       context: .
       target: web
@@ -81,7 +87,7 @@ services:
       - "3000"
     networks:
       default:
-        aliases: [shorts-web]
+        aliases: [corto-web]
     depends_on:
       api:
         condition: service_healthy

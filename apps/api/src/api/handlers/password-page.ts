@@ -48,7 +48,7 @@ export const renderPasswordPage = ({
   </head>
   <body>
     <main class="panel">
-      <div class="panel__head"><span class="signal"></span> Shorts</div>
+      <div class="panel__head"><span class="signal"></span> Corto</div>
       <div class="panel__body">
         <h1>Questo link è protetto.</h1>
         <p class="copy">Inserisci la password per continuare verso la destinazione.</p>

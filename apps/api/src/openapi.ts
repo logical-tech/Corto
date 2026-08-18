@@ -106,7 +106,7 @@ export const openapi = {
   openapi: "3.1.0",
   servers: [{ url: "/api" }],
   info: {
-    title: "Shorts API",
+    title: "Corto API",
     version: "1.0.0",
     description:
       "Create short links and inspect click analytics. API keys are sent with x-api-key.",
