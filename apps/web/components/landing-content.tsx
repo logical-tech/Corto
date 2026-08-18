@@ -18,6 +18,8 @@ import { Brand } from "@/components/brand"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { ThemeToggle } from "@/components/theme-toggle"
 
+const repositoryUrl = "https://github.com/logical-tech/Corto"
+
 const routeRows = [
   ["sho.rt/brief", "design.example.com/brief", "12,482"],
   ["sho.rt/notes", "notes.example.com/issue-04", "3,620"],
@@ -48,6 +50,14 @@ export function LandingContent() {
           >
             {t("publicDocs")}
           </Link>
+          <a
+            className={`${buttonVariants({ variant: "ghost", size: "lg" })} max-sm:!hidden`}
+            href={repositoryUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>
           <ThemeToggle />
           <LanguageSwitcher />
           <Link
@@ -253,6 +263,14 @@ export function LandingContent() {
           <Link className="hover:text-foreground" href="/login">
             {t("signIn")}
           </Link>
+          <a
+            className="hover:text-foreground"
+            href={repositoryUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>
         </div>
       </footer>
     </main>
