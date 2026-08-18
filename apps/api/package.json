@@ -1,0 +1,33 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run migrate && bun --watch src/index.ts",
+    "start": "bun run migrate && bun src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "db:generate": "drizzle-kit generate",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "migrate": "bun src/migrate.ts"
+  },
+  "dependencies": {
+    "@better-auth/api-key": "^1.6.29",
+    "@better-auth/passkey": "1.6.29",
+    "@better-auth/redis-storage": "^1.6.29",
+    "@hono/zod-validator": "^0.9.0",
+    "better-auth": "^1.6.29",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.13.2",
+    "ioredis": "^5.11.0",
+    "pg": "^8.23.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.14",
+    "@types/pg": "^8.21.0",
+    "drizzle-kit": "^0.31.4",
+    "typescript": "~6"
+  }
+}

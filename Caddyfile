@@ -1,0 +1,27 @@
+{
+	auto_https off
+	admin off
+	servers {
+		trusted_proxies static private_ranges
+		trusted_proxies_strict
+		client_ip_headers X-Forwarded-For X-Real-IP
+	}
+}
+
+:{$CADDY_PORT:80} {
+	encode zstd gzip
+
+	@api path /api /api/*
+	handle @api {
+		reverse_proxy {$API_UPSTREAM:shorts-api:8787}
+	}
+
+	@web path {$WEB_ROUTES:/__no_gui__}
+	handle @web {
+		reverse_proxy {$WEB_UPSTREAM:shorts-api:8787}
+	}
+
+	handle {
+		reverse_proxy {$API_UPSTREAM:shorts-api:8787}
+	}
+}

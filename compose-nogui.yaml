@@ -1,0 +1,65 @@
+name: shorts-nogui
+
+services:
+  caddy:
+    image: ${CADDY_IMAGE:-shorts-caddy:latest}
+    build:
+      context: .
+      target: caddy
+    restart: unless-stopped
+    environment:
+      API_UPSTREAM: shorts-api:8787
+    expose:
+      - "80"
+    networks:
+      default:
+        aliases: [shorts-caddy]
+    depends_on:
+      api:
+        condition: service_healthy
+        restart: true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/api/health"]
+      interval: 15s
+      timeout: 5s
+      start_period: 5s
+      retries: 5
+
+  api:
+    image: ${API_IMAGE:-shorts-api:latest}
+    build:
+      context: .
+      target: api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 8787
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      REDIS_URL: ${REDIS_URL:?REDIS_URL is required}
+      REDIS_PREFIX: ${REDIS_PREFIX:-shorts:}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:?BETTER_AUTH_URL is required}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL is required}
+      SHORT_URL_BASE: ${SHORT_URL_BASE:?SHORT_URL_BASE is required}
+      IP_HASH_SECRET: ${IP_HASH_SECRET:?IP_HASH_SECRET is required}
+      TRUST_PROXY: ${TRUST_PROXY:-true}
+      CORS_ORIGINS: ${CORS_ORIGINS:?CORS_ORIGINS is required}
+      PASSKEY_RP_ID: ${PASSKEY_RP_ID:-}
+      PASSKEY_RP_NAME: ${PASSKEY_RP_NAME:-Shorts}
+      PASSKEY_ORIGIN: ${PASSKEY_ORIGIN:-}
+    expose:
+      - "8787"
+    networks:
+      default:
+        aliases: [shorts-api]
+    healthcheck:
+      test: ["CMD", "bun", "-e", "const r=await fetch('http://127.0.0.1:8787/api/health');if(!r.ok)process.exit(1)"]
+      interval: 15s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+
+networks:
+  default:
+    name: ${DOCKER_NETWORK:-dokploy-network}
+    external: true

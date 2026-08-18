@@ -1,0 +1,15 @@
+{
+  "dashboardErrorTitle": "La panoramica non è disponibile",
+  "dashboardErrorDescription": "Controlla la connessione all’API e riprova.",
+  "mainMetrics": "Metriche principali",
+  "linksCreated": "Link creati",
+  "activeLinks": "attivi",
+  "clicksOverTime": "Click nel tempo",
+  "last30DaysTrend": "Andamento degli ultimi 30 giorni.",
+  "waitingForClicks": "In attesa dei primi click",
+  "shareToSeeTrend": "Condividi un link: l’andamento apparirà qui.",
+  "topLinks": "Link più visitati",
+  "topLinksDescription": "I link che stanno ricevendo più traffico.",
+  "noLinksToCompare": "Nessun link da confrontare",
+  "createFirstLink": "Crea il primo link per iniziare a raccogliere dati."
+}

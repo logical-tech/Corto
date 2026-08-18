@@ -1,0 +1,28 @@
+[variables]
+main_domain = "${domain}"
+public_url = "https://${main_domain}"
+postgres_password = "${password:32}"
+redis_password = "${password:32}"
+auth_secret = "${base64:32}"
+ip_hash_secret = "${base64:32}"
+admin_email = "admin@example.com"
+
+[config]
+env = [
+  "NEXT_PUBLIC_APP_URL=${public_url}",
+  "BETTER_AUTH_URL=${public_url}",
+  "SHORT_URL_BASE=${public_url}",
+  "CORS_ORIGINS=${public_url}",
+  "ADMIN_EMAIL=${admin_email}",
+  "POSTGRES_PASSWORD=${postgres_password}",
+  "REDIS_PASSWORD=${redis_password}",
+  "BETTER_AUTH_SECRET=${auth_secret}",
+  "IP_HASH_SECRET=${ip_hash_secret}",
+  "REDIS_PREFIX=shorts:"
+]
+mounts = []
+
+[[config.domains]]
+serviceName = "caddy"
+port = 80
+host = "${main_domain}"

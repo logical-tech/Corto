@@ -1,0 +1,15 @@
+{
+  "dashboardErrorTitle": "La descripción general no está disponible",
+  "dashboardErrorDescription": "Verifique la conexión API y vuelva a intentarlo.",
+  "mainMetrics": "Métricas clave",
+  "linksCreated": "Enlaces creados",
+  "activeLinks": "activo",
+  "clicksOverTime": "Clics a lo largo del tiempo",
+  "last30DaysTrend": "Tendencia de los últimos 30 días.",
+  "waitingForClicks": "Esperando los primeros clics",
+  "shareToSeeTrend": "Comparta un enlace para ver la tendencia aquí.",
+  "topLinks": "Enlaces principales",
+  "topLinksDescription": "Los enlaces que reciben más tráfico.",
+  "noLinksToCompare": "No hay enlaces para comparar",
+  "createFirstLink": "Crea tu primer enlace para comenzar a recopilar datos."
+}

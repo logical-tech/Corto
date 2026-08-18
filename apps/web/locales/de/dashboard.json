@@ -1,0 +1,15 @@
+{
+  "dashboardErrorTitle": "Übersicht ist nicht verfügbar",
+  "dashboardErrorDescription": "Überprüfen Sie die API-Verbindung und versuchen Sie es erneut.",
+  "mainMetrics": "Schlüsselkennzahlen",
+  "linksCreated": "Links erstellt",
+  "activeLinks": "aktiv",
+  "clicksOverTime": "Klicks im Laufe der Zeit",
+  "last30DaysTrend": "Trend der letzten 30 Tage.",
+  "waitingForClicks": "Warten auf die ersten Klicks",
+  "shareToSeeTrend": "Teilen Sie hier einen Link, um den Trend zu sehen.",
+  "topLinks": "Top-Links",
+  "topLinksDescription": "Die Links, die den meisten Verkehr erhalten.",
+  "noLinksToCompare": "Keine Links zum Vergleichen",
+  "createFirstLink": "Erstellen Sie Ihren ersten Link, um mit der Datenerfassung zu beginnen."
+}

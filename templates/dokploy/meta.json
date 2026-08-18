@@ -1,0 +1,12 @@
+{
+  "id": "shorts",
+  "name": "Shorts",
+  "version": "1.0.0",
+  "description": "Self-hosted URL shortener with analytics, a Hono API, and a Next.js dashboard.",
+  "logo": "shorts.svg",
+  "links": {
+    "github": "https://github.com/logical-tech/url-shortner",
+    "docs": "https://github.com/logical-tech/url-shortner/tree/main/docs"
+  },
+  "tags": ["url-shortener", "analytics", "productivity"]
+}

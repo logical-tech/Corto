@@ -1,0 +1,15 @@
+{
+  "dashboardErrorTitle": "Overview is unavailable",
+  "dashboardErrorDescription": "Check the API connection and try again.",
+  "mainMetrics": "Key metrics",
+  "linksCreated": "Links created",
+  "activeLinks": "active",
+  "clicksOverTime": "Clicks over time",
+  "last30DaysTrend": "Trend over the last 30 days.",
+  "waitingForClicks": "Waiting for the first clicks",
+  "shareToSeeTrend": "Share a link to see the trend here.",
+  "topLinks": "Top links",
+  "topLinksDescription": "The links receiving the most traffic.",
+  "noLinksToCompare": "No links to compare",
+  "createFirstLink": "Create your first link to start collecting data."
+}

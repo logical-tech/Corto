@@ -1,0 +1,15 @@
+{
+  "dashboardErrorTitle": "La vue d’ensemble est indisponible",
+  "dashboardErrorDescription": "Vérifiez la connexion à l’API et réessayez.",
+  "mainMetrics": "Indicateurs clés",
+  "linksCreated": "Liens créés",
+  "activeLinks": "actifs",
+  "clicksOverTime": "Clics au fil du temps",
+  "last30DaysTrend": "Tendance sur les 30 derniers jours.",
+  "waitingForClicks": "En attente des premiers clics",
+  "shareToSeeTrend": "Partagez un lien pour voir la tendance ici.",
+  "topLinks": "Liens les plus consultés",
+  "topLinksDescription": "Les liens qui reçoivent le plus de trafic.",
+  "noLinksToCompare": "Aucun lien à comparer",
+  "createFirstLink": "Créez votre premier lien pour commencer à collecter des données."
+}

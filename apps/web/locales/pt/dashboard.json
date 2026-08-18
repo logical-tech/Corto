@@ -1,0 +1,15 @@
+{
+  "dashboardErrorTitle": "A visão geral não está disponível",
+  "dashboardErrorDescription": "Verifique a conexão da API e tente novamente.",
+  "mainMetrics": "Métricas principais",
+  "linksCreated": "Links criados",
+  "activeLinks": "ativo",
+  "clicksOverTime": "Cliques ao longo do tempo",
+  "last30DaysTrend": "Tendência dos últimos 30 dias.",
+  "waitingForClicks": "Esperando pelos primeiros cliques",
+  "shareToSeeTrend": "Compartilhe um link para ver a tendência aqui.",
+  "topLinks": "Links principais",
+  "topLinksDescription": "Os links que recebem mais tráfego.",
+  "noLinksToCompare": "Não há links para comparar",
+  "createFirstLink": "Crie seu primeiro link para começar a coletar dados."
+}

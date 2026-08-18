@@ -1,0 +1,48 @@
+# Render blueprint: one web service running the all-in-one image, plus the
+# PostgreSQL and Key Value stores it needs. Render builds the last stage of the
+# Dockerfile (`standalone`), which puts Caddy, the API, and the dashboard behind
+# the single port Render exposes.
+services:
+  - type: web
+    name: shorts
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      # The entrypoint derives BETTER_AUTH_URL, SHORT_URL_BASE, CORS_ORIGINS,
+      # and NEXT_PUBLIC_APP_URL from RENDER_EXTERNAL_URL, so there is nothing
+      # to fill in before the service has a URL.
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      - key: IP_HASH_SECRET
+        generateValue: true
+      - key: REDIS_PREFIX
+        value: "shorts:"
+      - key: TRUST_PROXY
+        value: "true"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shorts-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: shorts-keyvalue
+          type: keyvalue
+          property: connectionString
+
+  - type: keyvalue
+    name: shorts-keyvalue
+    plan: starter
+    # Redirect caches only; PostgreSQL stays authoritative.
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
+
+databases:
+  - name: shorts-postgres
+    databaseName: shorts
+    user: shorts
+    plan: basic-256mb

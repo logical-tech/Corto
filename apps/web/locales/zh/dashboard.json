@@ -1,0 +1,15 @@
+{
+  "dashboardErrorTitle": "概览不可用",
+  "dashboardErrorDescription": "检查 API 连接并重试。",
+  "mainMetrics": "关键指标",
+  "linksCreated": "已创建链接",
+  "activeLinks": "活跃的",
+  "clicksOverTime": "随着时间的推移点击次数",
+  "last30DaysTrend": "过去 30 天的趋势。",
+  "waitingForClicks": "等待第一次点击",
+  "shareToSeeTrend": "分享一个链接以查看此处的趋势。",
+  "topLinks": "热门链接",
+  "topLinksDescription": "接收最多流量的链接。",
+  "noLinksToCompare": "没有可比较的链接",
+  "createFirstLink": "创建您的第一个链接以开始收集数据。"
+}

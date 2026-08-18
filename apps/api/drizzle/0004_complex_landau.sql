@@ -1,0 +1,1 @@
+ALTER TABLE "advertising_settings" ADD COLUMN "automatic_redirect" boolean DEFAULT false NOT NULL;

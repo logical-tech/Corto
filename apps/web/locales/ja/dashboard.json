@@ -1,0 +1,15 @@
+{
+  "dashboardErrorTitle": "概要は利用できません",
+  "dashboardErrorDescription": "API接続を確認して再試行してください。",
+  "mainMetrics": "主要な指標",
+  "linksCreated": "作成されたリンク",
+  "activeLinks": "アクティブな",
+  "clicksOverTime": "時間の経過に伴うクリック数",
+  "last30DaysTrend": "過去 30 日間の傾向。",
+  "waitingForClicks": "最初のクリックを待っています",
+  "shareToSeeTrend": "ここで傾向を確認するには、リンクを共有してください。",
+  "topLinks": "トップリンク",
+  "topLinksDescription": "最も多くのトラフィックを受信するリンク。",
+  "noLinksToCompare": "比較するリンクがありません",
+  "createFirstLink": "最初のリンクを作成してデータ収集を開始します。"
+}

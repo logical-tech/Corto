@@ -1,0 +1,93 @@
+name: shorts
+
+services:
+  caddy:
+    image: ${CADDY_IMAGE:-shorts-caddy:latest}
+    build:
+      context: .
+      target: caddy
+    restart: unless-stopped
+    environment:
+      API_UPSTREAM: shorts-api:8787
+      WEB_UPSTREAM: shorts-web:3000
+      WEB_ROUTES: "/ /login /login/* /register /register/* /two-factor /two-factor/* /account /account/* /users /users/* /dashboard /dashboard/* /links /links/* /api-keys /api-keys/* /settings /settings/* /docs /docs/* /_next/* /robots.txt /sitemap.xml /opengraph-image /favicon.ico"
+    expose:
+      - "80"
+    networks:
+      default:
+        aliases: [shorts-caddy]
+    depends_on:
+      api:
+        condition: service_healthy
+        restart: true
+      web:
+        condition: service_started
+        restart: true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/api/health"]
+      interval: 15s
+      timeout: 5s
+      start_period: 5s
+      retries: 5
+
+  api:
+    image: ${API_IMAGE:-shorts-api:latest}
+    build:
+      context: .
+      target: api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 8787
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      REDIS_URL: ${REDIS_URL:?REDIS_URL is required}
+      REDIS_PREFIX: ${REDIS_PREFIX:-shorts:}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:?BETTER_AUTH_URL is required}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL is required}
+      SHORT_URL_BASE: ${SHORT_URL_BASE:?SHORT_URL_BASE is required}
+      IP_HASH_SECRET: ${IP_HASH_SECRET:?IP_HASH_SECRET is required}
+      TRUST_PROXY: ${TRUST_PROXY:-true}
+      CORS_ORIGINS: ${CORS_ORIGINS:?CORS_ORIGINS is required}
+      PASSKEY_RP_ID: ${PASSKEY_RP_ID:-}
+      PASSKEY_RP_NAME: ${PASSKEY_RP_NAME:-Shorts}
+      PASSKEY_ORIGIN: ${PASSKEY_ORIGIN:-}
+    expose:
+      - "8787"
+    networks:
+      default:
+        aliases: [shorts-api]
+    healthcheck:
+      test: ["CMD", "bun", "-e", "const r=await fetch('http://127.0.0.1:8787/api/health');if(!r.ok)process.exit(1)"]
+      interval: 15s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+
+  web:
+    image: ${WEB_IMAGE:-shorts-web:latest}
+    build:
+      context: .
+      target: web
+      args:
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL is required}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL is required}
+    expose:
+      - "3000"
+    networks:
+      default:
+        aliases: [shorts-web]
+    depends_on:
+      api:
+        condition: service_healthy
+        restart: true
+
+networks:
+  default:
+    name: ${DOCKER_NETWORK:-dokploy-network}
+    external: true
