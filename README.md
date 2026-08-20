@@ -1,5 +1,7 @@
 # Corto
 
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
+
 **A modern URL shortener that stays yours.** Free, open source, and easy to
 self-host in several ways. Password-protect a link, give it an expiry date or a
 click limit, run your own ads on it, and read the analytics from the dashboard —
@@ -102,3 +104,9 @@ docker compose -f compose-nogui.yaml up -d --build
 ```
 
 Only Caddy is exposed on the Docker network, at port `80`; `web:3000` and `api:8787` remain private. In Dokploy, attach the only domain to the `caddy` service on port `80`.
+
+## License
+
+[GNU Affero General Public License v3.0](LICENSE). Use it, self-host it, change
+it — keep the copyright notice, and publish your source if you run a modified
+version as a network service.
