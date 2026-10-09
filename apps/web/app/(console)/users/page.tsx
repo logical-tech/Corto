@@ -15,17 +15,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@workspace/ui/components/alert-dialog"
-import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card"
 import {
   Dialog,
   DialogContent,
@@ -34,6 +25,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@workspace/ui/components/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@workspace/ui/components/dropdown-menu"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import {
@@ -54,13 +51,13 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 import { toast } from "@workspace/ui/components/toast"
+import { cn } from "@workspace/ui/lib/utils"
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
+  EllipsisIcon,
   KeyRoundIcon,
   SearchIcon,
-  ShieldBanIcon,
-  ShieldCheckIcon,
   Trash2Icon,
   TriangleAlertIcon,
   UserPlusIcon,
@@ -80,6 +77,22 @@ const emptyUser: {
   role: "admin" | "user"
 } = { name: "", email: "", password: "", role: "user" }
 
+const filters = {
+  all: undefined,
+  admin: { filterField: "role", filterValue: "admin" },
+  user: { filterField: "role", filterValue: "user" },
+  banned: { filterField: "banned", filterValue: true },
+} as const
+type Filter = keyof typeof filters
+
+async function countUsers(filter: Filter) {
+  const response = await authClient.admin.listUsers({
+    query: { limit: 1, filterOperator: "eq", ...filters[filter] },
+  })
+  if (response.error) throw new Error(response.error.message)
+  return response.data.total
+}
+
 export default function UsersPage() {
   const { t, i18n } = useTranslation("settings")
   const { t: common } = useTranslation("common")
@@ -87,6 +100,7 @@ export default function UsersPage() {
   const client = useQueryClient()
   const { data: session } = authClient.useSession()
   const [search, setSearch] = useState("")
+  const [filter, setFilter] = useState<Filter>("all")
   const [page, setPage] = useState(0)
   const [createOpen, setCreateOpen] = useState(false)
   const [newUser, setNewUser] = useState(emptyUser)
@@ -94,9 +108,13 @@ export default function UsersPage() {
     id: string
     name: string
   } | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string
+    name: string
+  } | null>(null)
   const [newPassword, setNewPassword] = useState("")
   const users = useQuery({
-    queryKey: ["users", search, page],
+    queryKey: ["users", search, filter, page],
     queryFn: async () => {
       const response = await authClient.admin.listUsers({
         query: {
@@ -107,10 +125,22 @@ export default function UsersPage() {
           searchOperator: "contains",
           sortBy: "createdAt",
           sortDirection: "desc",
+          filterOperator: "eq",
+          ...filters[filter],
         },
       })
       if (response.error) throw new Error(response.error.message)
       return response.data
+    },
+  })
+  const counts = useQuery({
+    queryKey: ["users", "counts"],
+    queryFn: async () => {
+      const keys = Object.keys(filters) as Filter[]
+      const totals = await Promise.all(keys.map(countUsers))
+      return Object.fromEntries(
+        keys.map((key, index) => [key, totals[index]])
+      ) as Record<Filter, number>
     },
   })
 
@@ -180,6 +210,7 @@ export default function UsersPage() {
       if (response.error) throw new Error(response.error.message)
     },
     onSuccess: () => {
+      setDeleteTarget(null)
       if (users.data?.users.length === 1) {
         setPage((current) => Math.max(0, current - 1))
       }
@@ -214,377 +245,359 @@ export default function UsersPage() {
     toggleBan.error ??
     removeUser.error ??
     setUserPassword.error
+  type User = NonNullable<typeof users.data>["users"][number]
+
+  const filterLabels: Record<Filter, string> = {
+    all: t("filterAll"),
+    admin: t("filterAdmins"),
+    user: t("filterMembers"),
+    banned: t("banned"),
+  }
+
+  const avatar = (user: User) => (
+    <div
+      aria-hidden
+      className={cn(
+        "flex size-10 shrink-0 items-center justify-center rounded-full text-[15px] font-semibold uppercase",
+        user.banned
+          ? "bg-subtle-foreground text-background"
+          : "bg-foreground text-background"
+      )}
+    >
+      {user.name.charAt(0)}
+    </div>
+  )
+
+  const identity = (user: User) => (
+    <div className="flex min-w-0 items-center gap-3.5">
+      {avatar(user)}
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <p className="flex items-baseline gap-1.5 truncate text-[15px] font-semibold">
+          <span className="truncate">{user.name}</span>
+          {user.id === session?.user.id ? (
+            <span className="text-[13px] font-normal text-muted-foreground">
+              {t("you")}
+            </span>
+          ) : null}
+        </p>
+        <p className="truncate text-[13px] text-muted-foreground">
+          {user.email}
+        </p>
+      </div>
+    </div>
+  )
+
+  const roleSelect = (user: User) => (
+    <Select
+      items={{ user: t("member"), admin: t("admin") }}
+      value={user.role || "user"}
+      disabled={user.id === session?.user.id || updateRole.isPending}
+      onValueChange={(role) =>
+        updateRole.mutate({
+          userId: user.id,
+          role: role as "admin" | "user",
+        })
+      }
+    >
+      <SelectTrigger
+        aria-label={t("role")}
+        className="h-9 w-fit min-w-24 gap-1.5 px-3 font-medium"
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent align="start">
+        <SelectGroup>
+          <SelectItem value="user">{t("member")}</SelectItem>
+          <SelectItem value="admin">{t("administrator")}</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  )
+
+  const statusPill = (user: User) => (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-[5px] text-xs font-semibold",
+        user.banned
+          ? "bg-muted text-muted-foreground"
+          : "bg-success-soft text-success"
+      )}
+    >
+      <span aria-hidden className="size-1.5 rounded-full bg-current" />
+      {user.banned ? t("banned") : common("active")}
+    </span>
+  )
+
+  const actions = (user: User) => {
+    const isCurrentUser = user.id === session?.user.id
+    return (
+      <div className="flex items-center justify-end gap-3">
+        {isCurrentUser ? null : (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="font-semibold"
+            disabled={toggleBan.isPending || removeUser.isPending}
+            onClick={() =>
+              toggleBan.mutate({
+                userId: user.id,
+                banned: Boolean(user.banned),
+              })
+            }
+          >
+            {user.banned ? t("unbanUser") : t("banUser")}
+          </Button>
+        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button
+                variant="outline"
+                size="icon-sm"
+                className="rounded-full"
+                aria-label={t("moreActions", { name: user.name })}
+              />
+            }
+          >
+            <EllipsisIcon />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              disabled={setUserPassword.isPending}
+              onClick={() => {
+                setUserPassword.reset()
+                setNewPassword("")
+                setPasswordUser({ id: user.id, name: user.name })
+              }}
+            >
+              <KeyRoundIcon />
+              {t("setUserPassword")}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              variant="destructive"
+              disabled={isCurrentUser || removeUser.isPending}
+              onClick={() => {
+                removeUser.reset()
+                setDeleteTarget({ id: user.id, name: user.name })
+              }}
+            >
+              <Trash2Icon />
+              {t("deleteUser")}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    )
+  }
+
+  const showingFrom = page * pageSize + 1
+  const showingTo = page * pageSize + (users.data?.users.length ?? 0)
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-[-0.03em]">
-            {t("userManagement")}
+      <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-[32px] leading-tight font-bold tracking-[-0.6px]">
+            {common("users")}
           </h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
+          <p className="max-w-2xl text-base text-muted-foreground">
             {t("userManagementDescription")}
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          {users.data ? (
-            <Badge variant="outline">
-              {t("userCount", { count: users.data.total })}
-            </Badge>
-          ) : null}
-          <Button
-            onClick={() => {
-              createUser.reset()
-              setCreateOpen(true)
-            }}
-          >
-            <UserPlusIcon data-icon="inline-start" />
-            {t("createUser")}
-          </Button>
-        </div>
+        <Button
+          size="lg"
+          className="w-full px-6 sm:w-fit"
+          onClick={() => {
+            createUser.reset()
+            setCreateOpen(true)
+          }}
+        >
+          <UserPlusIcon data-icon="inline-start" />
+          {t("createUser")}
+        </Button>
       </header>
 
-      <Card className="surface-shadow gap-0 overflow-hidden py-0">
-        <CardHeader className="flex-row items-center justify-between gap-4 px-5 pt-5 sm:px-6">
-          <div className="space-y-1.5">
-            <CardTitle>{common("users")}</CardTitle>
-            <CardDescription>{t("usersDescription")}</CardDescription>
-          </div>
-          <div className="relative w-full max-w-xs">
-            <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={search}
-              className="pl-9"
-              placeholder={t("searchUsers")}
-              aria-label={t("searchUsers")}
-              onChange={(event) => {
-                setSearch(event.target.value)
+      <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
+        <div className="relative w-full md:w-[340px]">
+          <SearchIcon className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            type="search"
+            className="rounded-full pl-10"
+            placeholder={t("searchUsers")}
+            aria-label={t("searchUsers")}
+            onChange={(event) => {
+              setSearch(event.target.value)
+              setPage(0)
+            }}
+          />
+        </div>
+        <div
+          role="group"
+          aria-label={t("filterUsers")}
+          className="flex flex-wrap gap-2 md:gap-3"
+        >
+          {(Object.keys(filters) as Filter[]).map((key) => (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={filter === key}
+              onClick={() => {
+                setFilter(key)
                 setPage(0)
               }}
-            />
+              className={cn(
+                "h-10 rounded-full border px-4 text-sm font-medium transition-colors outline-none hover:border-foreground/40 focus-visible:ring-3 focus-visible:ring-ring/30",
+                filter === key
+                  ? "border-foreground bg-muted font-semibold ring-1 ring-foreground"
+                  : "border-border bg-background"
+              )}
+            >
+              {filterLabels[key]}
+              {counts.data ? ` · ${counts.data[key]}` : null}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {users.isPending ? <Skeleton className="h-80 rounded-2xl" /> : null}
+      {users.isError ? (
+        <Alert variant="destructive">
+          <TriangleAlertIcon />
+          <AlertTitle>{t("userManagementUnavailable")}</AlertTitle>
+          <AlertDescription>{users.error.message}</AlertDescription>
+        </Alert>
+      ) : null}
+      {users.isSuccess && users.data.users.length === 0 ? (
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-border px-5 py-16 text-center text-muted-foreground">
+          <UsersRoundIcon className="size-7" />
+          <p>{t("noUsers")}</p>
+        </div>
+      ) : null}
+      {users.isSuccess && users.data.users.length > 0 ? (
+        <>
+          <div className="hidden overflow-hidden rounded-2xl border border-border md:block">
+            <Table>
+              <TableHeader className="bg-muted [&_tr]:border-0">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="h-auto px-6 py-3.5 text-[13px] font-semibold text-muted-foreground">
+                    {t("user")}
+                  </TableHead>
+                  <TableHead className="h-auto py-3.5 text-[13px] font-semibold text-muted-foreground">
+                    {t("role")}
+                  </TableHead>
+                  <TableHead className="h-auto py-3.5 text-[13px] font-semibold text-muted-foreground">
+                    {common("status")}
+                  </TableHead>
+                  <TableHead className="h-auto py-3.5 text-[13px] font-semibold text-muted-foreground">
+                    {common("created")}
+                  </TableHead>
+                  <TableHead className="h-auto px-6 py-3.5">
+                    <span className="sr-only">{common("actions")}</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.data.users.map((user) => (
+                  <TableRow
+                    key={user.id}
+                    className="border-border-soft hover:bg-transparent"
+                  >
+                    <TableCell className="px-6 py-4">
+                      {identity(user)}
+                    </TableCell>
+                    <TableCell className="py-4">{roleSelect(user)}</TableCell>
+                    <TableCell className="py-4">{statusPill(user)}</TableCell>
+                    <TableCell className="py-4 text-sm text-muted-foreground">
+                      {formatDate(
+                        user.createdAt.toISOString(),
+                        i18n.resolvedLanguage
+                      )}
+                    </TableCell>
+                    <TableCell className="px-6 py-4">{actions(user)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
-        </CardHeader>
-        <CardContent className="px-0 pt-5">
-          {users.isPending ? <Skeleton className="mx-5 h-80 sm:mx-6" /> : null}
-          {users.isError ? (
-            <Alert variant="destructive" className="mx-5 sm:mx-6">
-              <TriangleAlertIcon />
-              <AlertTitle>{t("userManagementUnavailable")}</AlertTitle>
-              <AlertDescription>{users.error.message}</AlertDescription>
-            </Alert>
-          ) : null}
-          {users.isSuccess && users.data.users.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 px-5 py-16 text-center text-muted-foreground sm:px-6">
-              <UsersRoundIcon className="size-7" />
-              <p>{t("noUsers")}</p>
-            </div>
-          ) : null}
-          {users.isSuccess && users.data.users.length > 0 ? (
-            <>
-              <div className="hidden md:block">
-                <Table>
-                  <TableHeader className="bg-muted/45">
-                    <TableRow className="hover:bg-transparent">
-                      <TableHead className="px-5 sm:px-6">
-                        {t("user")}
-                      </TableHead>
-                      <TableHead>{t("role")}</TableHead>
-                      <TableHead>{common("status")}</TableHead>
-                      <TableHead>{common("created")}</TableHead>
-                      <TableHead className="px-5 text-right sm:px-6">
-                        {common("actions")}
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.data.users.map((user) => {
-                      const isCurrentUser = user.id === session?.user.id
-                      return (
-                        <TableRow key={user.id}>
-                          <TableCell className="px-5 sm:px-6">
-                            <p className="font-medium">{user.name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {user.email}
-                            </p>
-                          </TableCell>
-                          <TableCell>
-                            <Select
-                              value={user.role || "user"}
-                              disabled={isCurrentUser || updateRole.isPending}
-                              onValueChange={(role) =>
-                                updateRole.mutate({
-                                  userId: user.id,
-                                  role: role as "admin" | "user",
-                                })
-                              }
-                            >
-                              <SelectTrigger
-                                aria-label={t("role")}
-                                className="w-32"
-                              >
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent align="start">
-                                <SelectGroup>
-                                  <SelectItem value="user">
-                                    {t("member")}
-                                  </SelectItem>
-                                  <SelectItem value="admin">
-                                    {t("administrator")}
-                                  </SelectItem>
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={user.banned ? "destructive" : "outline"}
-                            >
-                              {user.banned ? t("banned") : common("active")}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {formatDate(
-                              user.createdAt.toISOString(),
-                              i18n.resolvedLanguage
-                            )}
-                          </TableCell>
-                          <TableCell className="px-5 sm:px-6">
-                            <div className="flex justify-end gap-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                disabled={
-                                  isCurrentUser ||
-                                  toggleBan.isPending ||
-                                  removeUser.isPending
-                                }
-                                onClick={() =>
-                                  toggleBan.mutate({
-                                    userId: user.id,
-                                    banned: Boolean(user.banned),
-                                  })
-                                }
-                              >
-                                {user.banned ? (
-                                  <ShieldCheckIcon data-icon="inline-start" />
-                                ) : (
-                                  <ShieldBanIcon data-icon="inline-start" />
-                                )}
-                                {user.banned ? t("unbanUser") : t("banUser")}
-                              </Button>
-                              <AlertDialog>
-                                <AlertDialogTrigger
-                                  disabled={
-                                    isCurrentUser || removeUser.isPending
-                                  }
-                                  render={
-                                    <Button variant="ghost" size="icon-sm" />
-                                  }
-                                >
-                                  <Trash2Icon />
-                                  <span className="sr-only">
-                                    {t("deleteUser")}
-                                  </span>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                      {t("deleteUser")}
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      {t("deleteUserDescription", {
-                                        name: user.name,
-                                      })}
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>
-                                      {common("cancel")}
-                                    </AlertDialogCancel>
-                                    <AlertDialogAction
-                                      variant="destructive"
-                                      disabled={removeUser.isPending}
-                                      onClick={() => removeUser.mutate(user.id)}
-                                    >
-                                      {t("deleteUser")}
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                              <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                disabled={setUserPassword.isPending}
-                                aria-label={t("setUserPassword")}
-                                onClick={() => {
-                                  setUserPassword.reset()
-                                  setNewPassword("")
-                                  setPasswordUser({
-                                    id: user.id,
-                                    name: user.name,
-                                  })
-                                }}
-                              >
-                                <KeyRoundIcon />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-              <div className="grid gap-3 px-5 md:hidden">
-                {users.data.users.map((user) => {
-                  const isCurrentUser = user.id === session?.user.id
-                  return (
-                    <div key={user.id} className="rounded-2xl border p-4">
-                      <div className="flex gap-3">
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate font-medium">{user.name}</p>
-                          <p className="truncate text-sm text-muted-foreground">
-                            {user.email}
-                          </p>
-                        </div>
-                        <Badge
-                          variant={user.banned ? "destructive" : "outline"}
-                        >
-                          {user.banned ? t("banned") : common("active")}
-                        </Badge>
-                      </div>
-                      <div className="mt-4 flex items-center justify-between gap-3">
-                        <Select
-                          value={user.role || "user"}
-                          disabled={isCurrentUser || updateRole.isPending}
-                          onValueChange={(role) =>
-                            updateRole.mutate({
-                              userId: user.id,
-                              role: role as "admin" | "user",
-                            })
-                          }
-                        >
-                          <SelectTrigger
-                            aria-label={t("role")}
-                            className="w-32"
-                          >
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent align="start">
-                            <SelectGroup>
-                              <SelectItem value="user">
-                                {t("member")}
-                              </SelectItem>
-                              <SelectItem value="admin">
-                                {t("administrator")}
-                              </SelectItem>
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={
-                              isCurrentUser ||
-                              toggleBan.isPending ||
-                              removeUser.isPending
-                            }
-                            onClick={() =>
-                              toggleBan.mutate({
-                                userId: user.id,
-                                banned: Boolean(user.banned),
-                              })
-                            }
-                          >
-                            {user.banned ? t("unbanUser") : t("banUser")}
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger
-                              disabled={isCurrentUser || removeUser.isPending}
-                              render={
-                                <Button variant="outline" size="icon-sm" />
-                              }
-                            >
-                              <Trash2Icon />
-                              <span className="sr-only">{t("deleteUser")}</span>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  {t("deleteUser")}
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  {t("deleteUserDescription", {
-                                    name: user.name,
-                                  })}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>
-                                  {common("cancel")}
-                                </AlertDialogCancel>
-                                <AlertDialogAction
-                                  variant="destructive"
-                                  disabled={removeUser.isPending}
-                                  onClick={() => removeUser.mutate(user.id)}
-                                >
-                                  {t("deleteUser")}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                          <Button
-                            variant="outline"
-                            size="icon-sm"
-                            disabled={setUserPassword.isPending}
-                            aria-label={t("setUserPassword")}
-                            onClick={() => {
-                              setUserPassword.reset()
-                              setNewPassword("")
-                              setPasswordUser({ id: user.id, name: user.name })
-                            }}
-                          >
-                            <KeyRoundIcon />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </>
-          ) : null}
-        </CardContent>
-        {users.isSuccess && users.data.users.length > 0 ? (
-          <div className="flex items-center justify-between border-t px-5 py-4 sm:px-6">
+          <ul className="grid gap-3 md:hidden">
+            {users.data.users.map((user) => (
+              <li
+                key={user.id}
+                className="flex flex-col gap-4 rounded-2xl border border-border p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  {identity(user)}
+                  {statusPill(user)}
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  {roleSelect(user)}
+                  {actions(user)}
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              {t("pageOf", { page: page + 1, total: pageCount })}
+              {t("showingUsers", {
+                from: showingFrom,
+                to: showingTo,
+                total: users.data.total,
+              })}
             </p>
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                size="sm"
+                size="icon"
+                className="size-9 rounded-full"
+                aria-label={t("previous")}
                 disabled={page === 0}
                 onClick={() => setPage((current) => current - 1)}
               >
-                <ChevronLeftIcon data-icon="inline-start" />
-                {t("previous")}
+                <ChevronLeftIcon />
               </Button>
               <Button
                 variant="outline"
-                size="sm"
+                size="icon"
+                className="size-9 rounded-full"
+                aria-label={t("next")}
                 disabled={!canGoNext}
                 onClick={() => setPage((current) => current + 1)}
               >
-                {t("next")}
-                <ChevronRightIcon data-icon="inline-end" />
+                <ChevronRightIcon />
               </Button>
             </div>
           </div>
-        ) : null}
-      </Card>
+        </>
+      ) : null}
+
+      <AlertDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => {
+          if (!open && !removeUser.isPending) setDeleteTarget(null)
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("deleteUser")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("deleteUserDescription", { name: deleteTarget?.name ?? "" })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{common("cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={removeUser.isPending}
+              onClick={() => {
+                if (deleteTarget) removeUser.mutate(deleteTarget.id)
+              }}
+            >
+              {t("deleteUser")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent>
@@ -651,6 +664,7 @@ export default function UsersPage() {
             <div className="grid gap-2">
               <Label htmlFor="user-role">{t("role")}</Label>
               <Select
+                items={{ user: t("member"), admin: t("administrator") }}
                 value={newUser.role}
                 onValueChange={(role) =>
                   setNewUser((current) => ({

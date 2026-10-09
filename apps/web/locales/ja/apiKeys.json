@@ -24,5 +24,10 @@
   "apiKeyCreated": "APIキーが作成されました",
   "apiKeyRevoked": "APIキーが取り消されました",
   "apiKeyNotRevoked": "キーは取り消されていませんでした",
-  "invalidKeyName": "認識可能な名前を入力します。"
+  "invalidKeyName": "認識可能な名前を入力します。",
+  "keyReady": "「{{name}}」の準備ができました。今すぐコピーしてください",
+  "activeKeysSummary": "有効 {{count}} 件 · 使わなくなったキーは取り消してください",
+  "headerTitle": "x-api-key ヘッダーで送信",
+  "headerDescription": "バージョン付き API へのリクエストにはキーが必要です。キーはいつでも取り消せます。",
+  "readApiDocs": "API ドキュメントを読む"
 }

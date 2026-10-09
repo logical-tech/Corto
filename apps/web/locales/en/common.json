@@ -52,5 +52,12 @@
   "openLink": "Open {{link}}",
   "signIn": "Sign in",
   "signUp": "Create account",
-  "getStarted": "Get started"
+  "getStarted": "Get started",
+  "findLink": "Find a link",
+  "searchHint": "Search slug, title or destination",
+  "search": "Search",
+  "accountMenu": "Account menu",
+  "toggleSidebar": "Toggle sidebar",
+  "selfHosted": "Self-hosted & open",
+  "selfHostedDescription": "Your links, your data. Corto runs on your own infrastructure."
 }

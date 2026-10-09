@@ -1,6 +1,6 @@
 "use client"
 
-import { LanguagesIcon } from "lucide-react"
+import { GlobeIcon } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { defaultLocale, languageKeys, locales } from "@/lib/i18n"
@@ -10,12 +10,14 @@ export function LanguageSwitcher() {
   const locale = i18n.resolvedLanguage ?? defaultLocale
 
   return (
-    <label className="relative inline-flex items-center rounded-2xl border border-input bg-card text-sm text-muted-foreground shadow-sm">
-      <LanguagesIcon aria-hidden="true" className="ml-3 size-3.5" />
-      <span className="sr-only">{t("language")}</span>
+    <label
+      title={t("language")}
+      className="relative inline-flex size-10 shrink-0 items-center justify-center rounded-full text-foreground transition-colors focus-within:ring-3 focus-within:ring-ring/30 hover:bg-muted"
+    >
+      <GlobeIcon aria-hidden="true" className="size-4.5" />
       <select
         aria-label={t("language")}
-        className="h-8 cursor-pointer appearance-none bg-transparent py-1 pr-7 pl-2 text-sm text-foreground outline-none"
+        className="absolute inset-0 cursor-pointer appearance-none rounded-full opacity-0 outline-none"
         value={locale}
         onChange={(event) => void i18n.changeLanguage(event.target.value)}
       >

@@ -24,5 +24,10 @@
   "apiKeyCreated": "API 密钥已创建",
   "apiKeyRevoked": "API 密钥已撤销",
   "apiKeyNotRevoked": "密钥未被撤销",
-  "invalidKeyName": "输入一个可识别的名称。"
+  "invalidKeyName": "输入一个可识别的名称。",
+  "keyReady": "“{{name}}”已就绪，请立即复制",
+  "activeKeysSummary": "{{count}} 个有效 · 撤销不再使用的密钥",
+  "headerTitle": "在 x-api-key 请求头中发送",
+  "headerDescription": "每个对版本化 API 的请求都需要密钥。密钥可随时撤销。",
+  "readApiDocs": "阅读 API 文档"
 }

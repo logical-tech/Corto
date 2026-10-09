@@ -14,12 +14,12 @@ const exitDuration = 150
 export function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const [leaving, setLeaving] = useState(false)
+  // Keyed by pathname so the exit state clears itself once the route changes.
+  const [leavingFrom, setLeavingFrom] = useState<string | null>(null)
   const isLeaving = useRef(false)
 
   useLayoutEffect(() => {
     isLeaving.current = false
-    setLeaving(false)
   }, [pathname])
 
   function onClick(event: MouseEvent<HTMLDivElement>) {
@@ -58,7 +58,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
     }
 
     isLeaving.current = true
-    setLeaving(true)
+    setLeavingFrom(pathname)
     window.setTimeout(
       () => router.push(`${url.pathname}${url.search}${url.hash}`),
       exitDuration
@@ -68,7 +68,11 @@ export function PageTransition({ children }: { children: ReactNode }) {
   return (
     <div
       key={pathname}
-      className={leaving ? "page-transition is-leaving" : "page-transition"}
+      className={
+        leavingFrom === pathname
+          ? "page-transition is-leaving"
+          : "page-transition"
+      }
       onClickCapture={onClick}
     >
       {children}

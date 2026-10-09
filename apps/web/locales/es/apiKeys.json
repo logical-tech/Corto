@@ -24,5 +24,10 @@
   "apiKeyCreated": "Clave API creada",
   "apiKeyRevoked": "Clave API revocada",
   "apiKeyNotRevoked": "La clave no fue revocada.",
-  "invalidKeyName": "Introduzca un nombre reconocible."
+  "invalidKeyName": "Introduzca un nombre reconocible.",
+  "keyReady": "“{{name}}” está lista, cópiala ahora",
+  "activeKeysSummary": "{{count}} activas · revoca las que ya no uses",
+  "headerTitle": "Envíala en el encabezado x-api-key",
+  "headerDescription": "Cada solicitud a la API versionada necesita una clave. Las claves se pueden revocar en cualquier momento.",
+  "readApiDocs": "Leer la documentación de la API"
 }

@@ -24,5 +24,10 @@
   "apiKeyCreated": "API-Schlüssel erstellt",
   "apiKeyRevoked": "API-Schlüssel widerrufen",
   "apiKeyNotRevoked": "Der Schlüssel wurde nicht widerrufen",
-  "invalidKeyName": "Geben Sie einen erkennbaren Namen ein."
+  "invalidKeyName": "Geben Sie einen erkennbaren Namen ein.",
+  "keyReady": "„{{name}}“ ist bereit, jetzt kopieren",
+  "activeKeysSummary": "{{count}} aktiv · widerrufe nicht mehr genutzte",
+  "headerTitle": "Im x-api-key-Header senden",
+  "headerDescription": "Jede Anfrage an die versionierte API braucht einen Schlüssel. Schlüssel lassen sich jederzeit widerrufen.",
+  "readApiDocs": "API-Dokumentation lesen"
 }

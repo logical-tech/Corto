@@ -52,5 +52,12 @@
   "openLink": "Apri {{link}}",
   "signIn": "Accedi",
   "signUp": "Crea l’account",
-  "getStarted": "Inizia"
+  "getStarted": "Inizia",
+  "findLink": "Trova un link",
+  "searchHint": "Cerca per slug, titolo o destinazione",
+  "search": "Cerca",
+  "accountMenu": "Menu account",
+  "toggleSidebar": "Mostra o nascondi barra laterale",
+  "selfHosted": "Self-hosted e open source",
+  "selfHostedDescription": "I tuoi link, i tuoi dati. Corto gira sulla tua infrastruttura."
 }

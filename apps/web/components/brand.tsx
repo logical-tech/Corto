@@ -5,17 +5,17 @@ export function Brand({ href = "/" }: { href?: string }) {
     <Link
       href={href}
       translate="no"
-      className="inline-flex min-h-10 items-center gap-2 rounded-xl font-semibold tracking-[-0.02em] focus-visible:ring-3 focus-visible:ring-ring/30"
+      className="inline-flex min-h-10 items-center gap-2.5 rounded-xl text-2xl font-extrabold tracking-[-0.8px] text-primary focus-visible:ring-3 focus-visible:ring-ring/30 focus-visible:outline-none"
     >
       <span
         aria-hidden="true"
-        className="relative flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm"
+        className="flex size-8.5 shrink-0 items-center justify-center gap-0.75 rounded-[10px] bg-primary text-primary-foreground"
       >
-        <span className="absolute left-1.5 size-1.5 rounded-full bg-current" />
-        <span className="absolute right-1.5 size-1.5 rounded-full bg-current" />
-        <span className="h-px w-3 bg-current" />
+        <span className="size-2.25 rounded-full bg-current" />
+        <span className="h-0.75 w-1 bg-current" />
+        <span className="size-2.25 rounded-full bg-current" />
       </span>
-      Corto
+      corto
     </Link>
   )
 }

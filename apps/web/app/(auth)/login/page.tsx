@@ -1,21 +1,24 @@
 "use client"
 
-import { AuthForm } from "@/components/auth-form"
+import { XIcon } from "lucide-react"
 import { useTranslation } from "react-i18next"
+
+import { AuthForm, AuthHeading, AuthPanel } from "@/components/auth-form"
 
 export default function LoginPage() {
   const { t } = useTranslation("auth")
   return (
-    <div className="flex flex-col gap-10">
-      <div>
-        <h1 className="max-w-[11ch] text-5xl leading-[0.94] font-semibold tracking-[-0.04em] text-balance sm:text-6xl">
-          {t("welcomeBack")}
-        </h1>
-        <p className="mt-5 max-w-[38ch] leading-6 text-pretty text-muted-foreground">
-          {t("signInDescription")}
-        </p>
-      </div>
+    <AuthPanel
+      title={t("loginOrSignUp")}
+      backHref="/"
+      backLabel={t("backToHome")}
+      backIcon={XIcon}
+    >
+      <AuthHeading
+        title={t("welcomeBack")}
+        description={t("signInDescription")}
+      />
       <AuthForm mode="login" />
-    </div>
+    </AuthPanel>
   )
 }

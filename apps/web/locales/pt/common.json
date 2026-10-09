@@ -52,5 +52,12 @@
   "openLink": "Abra {{link}}",
   "signIn": "Faça login",
   "signUp": "Criar conta",
-  "getStarted": "Comece"
+  "getStarted": "Comece",
+  "findLink": "Encontrar um link",
+  "searchHint": "Pesquise por slug, título ou destino",
+  "search": "Pesquisar",
+  "accountMenu": "Menu da conta",
+  "toggleSidebar": "Alternar barra lateral",
+  "selfHosted": "Auto-hospedado e aberto",
+  "selfHostedDescription": "Seus links, seus dados. O Corto roda na sua própria infraestrutura."
 }

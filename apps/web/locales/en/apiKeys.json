@@ -24,5 +24,10 @@
   "apiKeyCreated": "API key created",
   "apiKeyRevoked": "API key revoked",
   "apiKeyNotRevoked": "The key was not revoked",
-  "invalidKeyName": "Enter a recognizable name."
+  "invalidKeyName": "Enter a recognizable name.",
+  "keyReady": "“{{name}}” is ready, copy it now",
+  "activeKeysSummary": "{{count}} active · revoke any you no longer use",
+  "headerTitle": "Send it in the x-api-key header",
+  "headerDescription": "Every request to the versioned API needs a key. Keys can be revoked at any time.",
+  "readApiDocs": "Read the API docs"
 }

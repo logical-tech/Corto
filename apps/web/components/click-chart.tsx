@@ -6,7 +6,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@workspace/ui/components/chart"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Bar, BarChart, Cell, XAxis } from "recharts"
 import { useTranslation } from "react-i18next"
 
 import type { TimePoint } from "@/lib/api"
@@ -22,51 +22,44 @@ export function ClickChart({ series }: { series: TimePoint[] }) {
     ...point,
     label: formatChartDate(point.date, locale),
   }))
+  const peak = Math.max(0, ...series.map((point) => point.clicks))
 
   return (
     <ChartContainer
       config={config}
-      className="aspect-auto h-[260px] w-full"
-      initialDimension={{ width: 720, height: 260 }}
+      className="aspect-auto h-[240px] w-full"
+      initialDimension={{ width: 720, height: 240 }}
     >
-      <AreaChart
+      <BarChart
         accessibilityLayer
         data={data}
-        margin={{ left: 4, right: 4, top: 12 }}
+        barCategoryGap="22%"
+        margin={{ left: 0, right: 0, top: 8 }}
       >
-        <defs>
-          <linearGradient id="clicks-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop
-              offset="5%"
-              stopColor="var(--color-clicks)"
-              stopOpacity={0.28}
-            />
-            <stop
-              offset="95%"
-              stopColor="var(--color-clicks)"
-              stopOpacity={0.02}
-            />
-          </linearGradient>
-        </defs>
-        <CartesianGrid vertical={false} />
         <XAxis
           dataKey="label"
           axisLine={false}
           tickLine={false}
+          tickMargin={12}
           minTickGap={28}
         />
         <ChartTooltip
           cursor={false}
           content={<ChartTooltipContent indicator="line" />}
         />
-        <Area
-          dataKey="clicks"
-          type="monotone"
-          fill="url(#clicks-fill)"
-          stroke="var(--color-clicks)"
-          strokeWidth={2.5}
-        />
-      </AreaChart>
+        <Bar dataKey="clicks" radius={[4, 4, 0, 0]} minPointSize={2}>
+          {data.map((point) => (
+            <Cell
+              key={point.date}
+              fill={
+                peak > 0 && point.clicks === peak
+                  ? "var(--chart-1)"
+                  : "var(--chart-2)"
+              }
+            />
+          ))}
+        </Bar>
+      </BarChart>
     </ChartContainer>
   )
 }

@@ -52,5 +52,12 @@
   "openLink": "打开{{link}}",
   "signIn": "登录",
   "signUp": "创建帐户",
-  "getStarted": "开始使用"
+  "getStarted": "开始使用",
+  "findLink": "查找链接",
+  "searchHint": "按短码、标题或目标网址搜索",
+  "search": "搜索",
+  "accountMenu": "账户菜单",
+  "toggleSidebar": "切换侧边栏",
+  "selfHosted": "自托管且开源",
+  "selfHostedDescription": "你的链接，你的数据。Corto 运行在你自己的基础设施上。"
 }

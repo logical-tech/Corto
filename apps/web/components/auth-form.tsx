@@ -7,15 +7,8 @@ import {
   AlertTitle,
 } from "@workspace/ui/components/alert"
 import { Button } from "@workspace/ui/components/button"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@workspace/ui/components/field"
-import { Input } from "@workspace/ui/components/input"
 import { Spinner } from "@workspace/ui/components/spinner"
-import { ArrowRightIcon, KeyRoundIcon, LockKeyholeIcon } from "lucide-react"
+import { LockKeyholeIcon, ScanFaceIcon, type LucideIcon } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -24,11 +17,71 @@ import { z } from "zod"
 import { authClient, usePasskeyEnabled } from "@/lib/auth-client"
 import { api, type RegistrationStatus } from "@/lib/api"
 
+export function AuthPanel({
+  title,
+  backHref,
+  backLabel,
+  backIcon: BackIcon,
+  children,
+}: {
+  title: string
+  backHref: string
+  backLabel: string
+  backIcon: LucideIcon
+  children: React.ReactNode
+}) {
+  return (
+    <div className="w-full max-w-[35.5rem] overflow-hidden rounded-2xl bg-card text-card-foreground shadow-[0_8px_28px_rgb(0_0_0/0.25)]">
+      <div className="grid h-16 grid-cols-[2rem_1fr_2rem] items-center gap-2 border-b border-border-soft px-6">
+        <Link
+          href={backHref}
+          aria-label={backLabel}
+          title={backLabel}
+          className="flex size-8 items-center justify-center rounded-full outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30"
+        >
+          <BackIcon aria-hidden="true" className="size-4" />
+        </Link>
+        <p className="truncate text-center text-base font-bold">{title}</p>
+      </div>
+      <div className="flex flex-col gap-4 p-6">{children}</div>
+    </div>
+  )
+}
+
+export function AuthHeading({
+  title,
+  description,
+}: {
+  title: string
+  description: string
+}) {
+  return (
+    <>
+      <h1 className="text-[1.375rem] font-semibold text-pretty">{title}</h1>
+      <p className="text-[0.9375rem] text-pretty text-muted-foreground">
+        {description}
+      </p>
+    </>
+  )
+}
+
+export function AuthFooter({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="flex flex-wrap justify-center gap-x-1.5 pt-2 text-sm text-muted-foreground">
+      {children}
+    </p>
+  )
+}
+
+export const authLinkClassName =
+  "rounded-sm font-semibold text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/30"
+
 export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const { t } = useTranslation("auth")
   const [pending, setPending] = useState(false)
   const [formError, setFormError] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showPassword, setShowPassword] = useState(false)
   const formErrorRef = useRef<HTMLParagraphElement>(null)
   const isRegister = mode === "register"
   const passkeyStatus = usePasskeyEnabled()
@@ -140,57 +193,99 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     }
   }
 
+  const fields = [
+    ...(isRegister
+      ? [
+          {
+            name: "name",
+            label: t("name"),
+            autoComplete: "name",
+            placeholder: t("namePlaceholder"),
+          },
+        ]
+      : []),
+    {
+      name: "email",
+      label: t("email"),
+      type: "email",
+      autoComplete: "email",
+      placeholder: "name@company.com",
+    },
+    {
+      name: "password",
+      label: t("password"),
+      type: showPassword ? "text" : "password",
+      autoComplete: isRegister ? "new-password" : "current-password",
+    },
+  ]
+
   return (
-    <form className="flex w-full flex-col gap-8" onSubmit={onSubmit} noValidate>
-      <FieldGroup className="gap-5">
-        {isRegister ? (
-          <Field data-invalid={Boolean(errors.name)}>
-            <FieldLabel htmlFor="name">{t("name")}</FieldLabel>
-            <Input
-              id="name"
-              name="name"
-              autoComplete="name"
-              aria-invalid={Boolean(errors.name)}
-              placeholder="Ada Lovelace"
-              className="h-11 rounded-xl bg-background px-3.5"
-            />
-            <FieldError>{errors.name}</FieldError>
-          </Field>
-        ) : null}
-        <Field data-invalid={Boolean(errors.email)}>
-          <FieldLabel htmlFor="email">{t("email")}</FieldLabel>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            spellCheck={false}
-            aria-invalid={Boolean(errors.email)}
-            placeholder="name@company.com"
-            className="h-11 rounded-xl bg-background px-3.5"
-          />
-          <FieldError>{errors.email}</FieldError>
-        </Field>
-        <Field data-invalid={Boolean(errors.password)}>
-          <FieldLabel htmlFor="password">{t("password")}</FieldLabel>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete={isRegister ? "new-password" : "current-password"}
-            aria-invalid={Boolean(errors.password)}
-            className="h-11 rounded-xl bg-background px-3.5"
-          />
-          <FieldError>{errors.password}</FieldError>
-        </Field>
-      </FieldGroup>
+    <form className="flex w-full flex-col gap-4" onSubmit={onSubmit} noValidate>
+      <div className="flex flex-col divide-y divide-subtle-foreground rounded-[0.625rem] border border-subtle-foreground">
+        {fields.map((field) => (
+          <div
+            key={field.name}
+            className="flex items-center gap-3 px-3.5 py-2.5 first:rounded-t-[0.5625rem] last:rounded-b-[0.5625rem] focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-foreground has-aria-invalid:outline-2 has-aria-invalid:-outline-offset-1 has-aria-invalid:outline-destructive"
+          >
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <label
+                htmlFor={field.name}
+                className="text-xs text-muted-foreground"
+              >
+                {field.label}
+              </label>
+              <input
+                id={field.name}
+                name={field.name}
+                type={field.type ?? "text"}
+                autoComplete={field.autoComplete}
+                placeholder={field.placeholder}
+                spellCheck={false}
+                aria-invalid={Boolean(errors[field.name])}
+                aria-describedby={
+                  errors[field.name] ? `${field.name}-error` : undefined
+                }
+                className="w-full bg-transparent text-base outline-none placeholder:text-subtle-foreground"
+              />
+            </div>
+            {field.name === "password" ? (
+              <button
+                type="button"
+                aria-pressed={showPassword}
+                aria-controls="password"
+                onClick={() => setShowPassword((value) => !value)}
+                className="rounded-sm text-sm font-semibold outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/30"
+              >
+                {showPassword ? t("hidePassword") : t("showPassword")}
+              </button>
+            ) : null}
+          </div>
+        ))}
+      </div>
+
+      <div className="-mt-1 flex flex-col gap-1 text-xs">
+        {fields.map((field) =>
+          errors[field.name] ? (
+            <p
+              key={field.name}
+              id={`${field.name}-error`}
+              className="text-destructive"
+            >
+              {errors[field.name]}
+            </p>
+          ) : null
+        )}
+        {errors.password ? null : (
+          <p className="text-muted-foreground">{t("passwordHint")}</p>
+        )}
+      </div>
 
       {formError ? (
         <p
           ref={formErrorRef}
           role="alert"
           tabIndex={-1}
-          className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive"
+          className="rounded-[0.625rem] bg-destructive/10 p-3 text-sm text-destructive"
         >
           {formError}
         </p>
@@ -199,37 +294,44 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       <Button
         type="submit"
         size="lg"
-        className="h-12 justify-between rounded-xl px-5"
+        className="rounded-[0.625rem] font-semibold"
         disabled={pending}
       >
         {pending ? <Spinner data-icon="inline-start" /> : null}
         {isRegister ? t("signUp") : t("signIn")}
-        {!pending ? <ArrowRightIcon data-icon="inline-end" /> : null}
       </Button>
 
       {!isRegister && passkeyStatus.data?.passkeyEnabled ? (
-        <Button
-          type="button"
-          size="lg"
-          variant="outline"
-          className="h-12 rounded-xl"
-          disabled={pending}
-          onClick={signInWithPasskey}
-        >
-          <KeyRoundIcon data-icon="inline-start" />
-          {t("signInWithPasskey")}
-        </Button>
+        <>
+          <div className="flex items-center gap-4 py-1 text-xs text-muted-foreground">
+            <span className="h-px flex-1 bg-border-soft" />
+            {t("or")}
+            <span className="h-px flex-1 bg-border-soft" />
+          </div>
+          <Button
+            type="button"
+            size="lg"
+            variant="outline"
+            className="justify-between rounded-[0.625rem] border-foreground font-semibold"
+            disabled={pending}
+            onClick={signInWithPasskey}
+          >
+            <ScanFaceIcon data-icon="inline-start" className="size-5" />
+            {t("signInWithPasskey")}
+            <span aria-hidden="true" className="size-5" />
+          </Button>
+        </>
       ) : null}
 
-      <p className="text-center text-sm text-muted-foreground">
-        {isRegister ? t("alreadyHaveAccount") : t("needAccount")}{" "}
+      <AuthFooter>
+        {isRegister ? t("alreadyHaveAccount") : t("needAccount")}
         <Link
-          className="font-medium text-foreground underline hover:text-primary"
+          className={authLinkClassName}
           href={isRegister ? "/login" : "/register"}
         >
           {isRegister ? t("signIn") : t("signUp")}
         </Link>
-      </p>
+      </AuthFooter>
     </form>
   )
 }

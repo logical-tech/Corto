@@ -71,8 +71,27 @@ const isEditableTarget = (target: EventTarget | null) => {
   )
 }
 
+// Set by the landing page's shorten bar before it sends the visitor to sign up.
+export const pendingDestinationKey = "corto.pendingDestination"
+
+const readPendingDestination = () => {
+  try {
+    return normalizePastedDestination(
+      sessionStorage.getItem(pendingDestinationKey) ?? ""
+    )
+  } catch {
+    return null
+  }
+}
+
 export function QuickLinkCapture() {
-  const [destination, setDestination] = useState<string | null>(null)
+  const [destination, setDestination] = useState(readPendingDestination)
+
+  useEffect(() => {
+    try {
+      sessionStorage.removeItem(pendingDestinationKey)
+    } catch {}
+  }, [])
 
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent) => {

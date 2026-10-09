@@ -52,5 +52,12 @@
   "openLink": "Ouvrir {{link}}",
   "signIn": "Se connecter",
   "signUp": "Créer un compte",
-  "getStarted": "Commencer"
+  "getStarted": "Commencer",
+  "findLink": "Trouver un lien",
+  "searchHint": "Rechercher par slug, titre ou destination",
+  "search": "Rechercher",
+  "accountMenu": "Menu du compte",
+  "toggleSidebar": "Afficher ou masquer la barre latérale",
+  "selfHosted": "Auto-hébergé et ouvert",
+  "selfHostedDescription": "Vos liens, vos données. Corto tourne sur votre propre infrastructure."
 }

@@ -52,5 +52,12 @@
   "openLink": "{{link}}を開く",
   "signIn": "サインイン",
   "signUp": "アカウントを作成する",
-  "getStarted": "始めましょう"
+  "getStarted": "始めましょう",
+  "findLink": "リンクを探す",
+  "searchHint": "スラッグ、タイトル、リンク先で検索",
+  "search": "検索",
+  "accountMenu": "アカウントメニュー",
+  "toggleSidebar": "サイドバーを切り替え",
+  "selfHosted": "セルフホスト & オープン",
+  "selfHostedDescription": "あなたのリンク、あなたのデータ。Corto は自分のインフラで動きます。"
 }

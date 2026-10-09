@@ -1,278 +1,402 @@
 "use client"
 
-import { Badge } from "@workspace/ui/components/badge"
 import { buttonVariants } from "@workspace/ui/components/button"
+import { cn } from "@workspace/ui/lib/utils"
 import {
   ArrowRightIcon,
-  BarChart3Icon,
+  ChartColumnBigIcon,
+  ChartColumnIcon,
   CheckIcon,
+  CodeXmlIcon,
   KeyRoundIcon,
+  LinkIcon,
   MegaphoneIcon,
+  MenuIcon,
   RouteIcon,
+  ScissorsIcon,
+  SparklesIcon,
+  UserRoundIcon,
 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useId, useState, type FormEvent } from "react"
 import { useTranslation } from "react-i18next"
 
 import { useAppUrl } from "@/lib/app-url"
 import { Brand } from "@/components/brand"
 import { LanguageSwitcher } from "@/components/language-switcher"
+import {
+  normalizePastedDestination,
+  pendingDestinationKey,
+} from "@/components/quick-link-capture"
 import { ThemeToggle } from "@/components/theme-toggle"
 
-const repositoryUrl = "https://github.com/logical-tech/Corto"
+export const repositoryUrl = "https://github.com/logical-tech/Corto"
 
-const routeRows = [
-  ["sho.rt/brief", "design.example.com/brief", "12,482"],
-  ["sho.rt/notes", "notes.example.com/issue-04", "3,620"],
-  ["sho.rt/launch", "product.example.com/launch", "842"],
-] as const
-
-export function LandingContent() {
+export function SiteHeader({
+  active,
+  children,
+}: {
+  active: "links" | "api"
+  children?: React.ReactNode
+}) {
   const { t } = useTranslation("landing")
-  const apiUrl = `${useAppUrl()}/api`
-  const features = [
-    ["controllableLinks", "controllableLinksDescription", RouteIcon],
-    ["readableAnalytics", "readableAnalyticsDescription", BarChart3Icon],
-    ["advertisingRedirects", "advertisingRedirectsDescription", MegaphoneIcon],
-    ["firstClassApi", "firstClassApiDescription", KeyRoundIcon],
+  const tabs = [
+    ["links", "/", "shortLinks", LinkIcon],
+    ["analytics", "/#features", "analytics", ChartColumnIcon],
+    ["api", "/docs", "api", CodeXmlIcon],
   ] as const
 
   return (
-    <main id="main-content" tabIndex={-1} className="overflow-hidden">
-      <header className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <Brand />
-        <nav
-          aria-label="Primary navigation"
-          className="flex items-center gap-1"
-        >
-          <Link
-            className={`${buttonVariants({ variant: "ghost", size: "lg" })} max-sm:!hidden`}
-            href="/docs"
+    <header className="border-b border-border-soft">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-7 px-5 pt-5 pb-5 sm:px-8 lg:px-20 lg:pt-6">
+        <div className="flex items-center justify-between gap-4">
+          <div className="lg:w-80">
+            <Brand />
+          </div>
+          <nav
+            aria-label={t("primaryNavigation")}
+            className="flex items-center gap-8 max-lg:hidden"
           >
-            {t("publicDocs")}
-          </Link>
-          <a
-            className={`${buttonVariants({ variant: "ghost", size: "lg" })} max-sm:!hidden`}
-            href={repositoryUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            GitHub
-          </a>
-          <ThemeToggle />
-          <LanguageSwitcher />
-          <Link
-            className={`${buttonVariants({ variant: "ghost", size: "lg" })} max-sm:!hidden`}
-            href="/login"
-          >
-            {t("signIn")}
-          </Link>
-          <Link
-            className={`${buttonVariants({ size: "lg" })} max-sm:!hidden`}
-            href="/register"
-          >
-            {t("getStarted")}
-            <ArrowRightIcon data-icon="inline-end" />
-          </Link>
-        </nav>
-      </header>
-
-      <section className="mx-auto grid min-h-[calc(100svh-5rem)] max-w-7xl min-w-0 items-center gap-14 px-5 py-14 sm:px-8 lg:grid-cols-[0.86fr_1.14fr] lg:py-20">
-        <div className="flex max-w-2xl min-w-0 flex-col items-start gap-7">
-          <h1 className="max-w-[12ch] text-5xl font-semibold tracking-[-0.04em] text-balance sm:text-6xl lg:text-[5.5rem] lg:leading-[0.96]">
-            {t("landingTitle")}
-          </h1>
-          <p className="max-w-[62ch] text-lg leading-8 text-pretty text-muted-foreground sm:text-xl">
-            {t("landingDescription")}
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link className={buttonVariants({ size: "lg" })} href="/register">
-              {t("createLink")}
-              <ArrowRightIcon data-icon="inline-end" />
-            </Link>
+            {tabs.map(([key, href, label, Icon]) => (
+              <Link
+                aria-current={active === key ? "page" : undefined}
+                className={cn(
+                  "-mb-px flex items-center gap-2 border-b-2 whitespace-nowrap pt-1.5 pb-2.5 text-[15px] font-semibold transition-colors",
+                  active === key
+                    ? "border-foreground text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                )}
+                href={href}
+                key={key}
+              >
+                <Icon aria-hidden="true" className="size-5" strokeWidth={1.5} />
+                {t(label)}
+              </Link>
+            ))}
+          </nav>
+          <div className="flex items-center justify-end gap-1 lg:w-80">
             <Link
-              className={buttonVariants({ size: "lg", variant: "outline" })}
+              className="rounded-full px-3.5 py-2.5 text-sm font-semibold whitespace-nowrap hover:bg-muted max-sm:hidden"
               href="/docs"
             >
+              {t("publicDocs")}
+            </Link>
+            <a
+              className="rounded-full px-3.5 py-2.5 text-sm font-semibold whitespace-nowrap hover:bg-muted max-sm:hidden"
+              href={repositoryUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub
+            </a>
+            <ThemeToggle />
+            <LanguageSwitcher />
+            <Link
+              aria-label={t("signIn")}
+              className="ml-1 flex items-center gap-2.5 rounded-full border border-border py-1 pr-1 pl-3.5 transition-shadow hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/30 focus-visible:outline-none"
+              href="/login"
+              title={t("signIn")}
+            >
+              <MenuIcon aria-hidden="true" className="size-4" />
+              <span className="flex size-8 items-center justify-center rounded-full bg-muted-foreground text-background">
+                <UserRoundIcon aria-hidden="true" className="size-[18px]" />
+              </span>
+            </Link>
+          </div>
+        </div>
+        {children}
+      </div>
+    </header>
+  )
+}
+
+function ShortenBar() {
+  const { t } = useTranslation("landing")
+  const router = useRouter()
+  const inputId = useId()
+  const [invalid, setInvalid] = useState(false)
+
+  // Signed-out visitors land on /register, signed-in ones are bounced to the
+  // dashboard; either way the console's quick-link dialog picks the URL up.
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const destination = normalizePastedDestination(
+      String(new FormData(event.currentTarget).get("destination") ?? "")
+    )
+    setInvalid(!destination)
+    if (!destination) return
+    try {
+      sessionStorage.setItem(pendingDestinationKey, destination)
+    } catch {}
+    router.push("/register")
+  }
+
+  return (
+    <form
+      className="mx-auto w-full max-w-[900px] pb-3 lg:pb-4"
+      noValidate
+      onSubmit={submit}
+    >
+      <div className="flex items-center gap-2 rounded-full bg-background p-2 pl-0 shadow-[0_3px_12px_rgb(0_0_0/0.1),0_1px_2px_rgb(0_0_0/0.08)] ring-1 ring-border-soft">
+        <label
+          className="flex min-w-0 flex-1 cursor-text flex-col gap-0.5 rounded-full px-6 py-1.5 focus-within:bg-muted sm:px-8"
+          htmlFor={inputId}
+        >
+          <span className="text-xs font-bold" id={`${inputId}-label`}>
+            {t("destination")}
+          </span>
+          <input
+            aria-describedby={invalid ? `${inputId}-error` : undefined}
+            aria-invalid={invalid}
+            aria-labelledby={`${inputId}-label`}
+            autoComplete="url"
+            className="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            id={inputId}
+            inputMode="url"
+            name="destination"
+            onChange={() => setInvalid(false)}
+            placeholder={t("destinationPlaceholder")}
+            type="text"
+          />
+        </label>
+        <button
+          className="flex h-13 shrink-0 items-center gap-2 rounded-full bg-primary pr-5.5 pl-4.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary-hover focus-visible:ring-3 focus-visible:ring-ring/30 focus-visible:outline-none max-sm:size-13 max-sm:justify-center max-sm:p-0"
+          type="submit"
+        >
+          <ScissorsIcon aria-hidden="true" className="size-[18px]" />
+          <span className="max-sm:sr-only">{t("shorten")}</span>
+        </button>
+      </div>
+      {invalid ? (
+        <p
+          className="mt-2 px-8 text-sm text-destructive"
+          id={`${inputId}-error`}
+          role="alert"
+        >
+          {t("invalidDestination")}
+        </p>
+      ) : null}
+    </form>
+  )
+}
+
+export function LandingContent() {
+  const { t } = useTranslation("landing")
+  const appUrl = useAppUrl()
+  const apiUrl = `${appUrl}/api`
+  const features = [
+    ["controllableLinks", "controllableLinksDescription", RouteIcon],
+    ["readableAnalytics", "readableAnalyticsDescription", ChartColumnBigIcon],
+    ["advertisingRedirects", "advertisingRedirectsDescription", MegaphoneIcon],
+    ["firstClassApi", "firstClassApiDescription", KeyRoundIcon],
+  ] as const
+  const developerChecks = ["checkKeys", "checkMcp", "checkRateLimit"] as const
+  const footerColumns = [
+    [
+      "product",
+      [
+        ["/dashboard", t("dashboard")],
+        ["/links/new", t("createLink")],
+        ["/#features", t("analytics")],
+        ["/#features", t("advertisingRedirects")],
+      ],
+    ],
+    [
+      "developers",
+      [
+        ["/docs", t("publicDocs")],
+        [`${apiUrl}/openapi.json`, t("openApiJson")],
+        ["/docs#endpoints", t("mcpEndpoint")],
+        ["/docs#self-host", t("selfHostGuide")],
+      ],
+    ],
+    [
+      "openSource",
+      [
+        [repositoryUrl, "GitHub"],
+        [`${repositoryUrl}/blob/main/LICENSE`, t("license")],
+        [`${repositoryUrl}/blob/main/docs/DEPLOY.md`, t("deployOnDokploy")],
+        [`${repositoryUrl}/blob/main/docs/COOLIFY.md`, t("deployOnCoolify")],
+      ],
+    ],
+  ] as const
+
+  return (
+    <>
+      <SiteHeader active="links">
+        <ShortenBar />
+      </SiteHeader>
+      <main id="main-content" tabIndex={-1} className="overflow-hidden">
+        <section className="mx-auto flex max-w-[1440px] flex-col items-center gap-5 px-5 pt-16 pb-20 text-center sm:px-8 lg:px-20 lg:pt-22 lg:pb-24">
+          <p className="flex items-center gap-2 rounded-full bg-primary-soft px-3.5 py-1.5 text-[13px] font-semibold text-primary-hover dark:text-primary">
+            <SparklesIcon aria-hidden="true" className="size-3.5" />
+            {t("eyebrow")}
+          </p>
+          <h1 className="max-w-[760px] text-5xl font-bold tracking-[-0.035em] text-balance sm:text-6xl lg:text-[72px] lg:leading-[73px]">
+            {t("landingTitle")}
+          </h1>
+          <p className="max-w-[640px] text-lg leading-7 text-pretty text-muted-foreground sm:text-xl sm:leading-[29px]">
+            {t("landingDescription")}
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 pt-3">
+            <Link
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "h-auto rounded-[10px] px-6 py-3.5 text-base"
+              )}
+              href="/register"
+            >
+              {t("getStartedFree")}
+            </Link>
+            <Link
+              className={cn(
+                buttonVariants({ size: "lg", variant: "outline" }),
+                "h-auto rounded-[10px] px-6 py-3.5 text-base"
+              )}
+              href="/docs"
+            >
+              <CodeXmlIcon aria-hidden="true" data-icon="inline-start" />
               {t("exploreApi")}
             </Link>
           </div>
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <CheckIcon className="text-primary" aria-hidden="true" />
-            {t("landingNote")}
-          </p>
-        </div>
+        </section>
 
-        <div
-          aria-label={t("liveRoutes")}
-          className="relative min-h-[500px] min-w-0 rounded-2xl bg-card p-5 shadow-[0_24px_80px_-48px_oklch(0.18_0.025_260/0.65)] ring-1 ring-foreground/5 sm:p-8"
-        >
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <RouteIcon aria-hidden="true" />
-              {t("liveRoutes")}
+        <section id="features" className="content-auto scroll-mt-4 bg-muted">
+          <div className="mx-auto flex max-w-[1440px] flex-col gap-12 px-5 py-20 sm:px-8 lg:px-20">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <h2 className="max-w-[16ch] text-4xl font-bold tracking-[-0.03em] text-balance lg:text-[44px] lg:leading-[48px]">
+                {t("landingFeatures")}
+              </h2>
+              <p className="max-w-[480px] text-lg leading-[27px] text-pretty text-muted-foreground">
+                {t("landingFeaturesDescription")}
+              </p>
             </div>
-            <Badge variant="secondary">{t("illustrativeData")}</Badge>
-          </div>
-
-          <div className="mt-10 overflow-hidden rounded-2xl bg-background ring-1 ring-foreground/5">
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 border-b px-5 py-3 text-xs font-medium text-muted-foreground sm:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_auto]">
-              <span>{t("shortLink")}</span>
-              <span className="hidden sm:block">{t("destination")}</span>
-              <span>{t("clicks")}</span>
-            </div>
-            <div className="divide-y">
-              {routeRows.map(([slug, destination, clicks]) => (
-                <div
-                  className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 px-5 py-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_auto]"
-                  key={slug}
+            <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {features.map(([title, description, Icon]) => (
+                <article
+                  className="flex flex-col gap-4 rounded-[20px] bg-background p-7"
+                  key={title}
                 >
-                  <span className="truncate font-mono text-sm font-medium">
-                    {slug}
+                  <span className="flex size-13 items-center justify-center rounded-[14px] bg-primary-soft text-primary">
+                    <Icon aria-hidden="true" className="size-6" />
                   </span>
-                  <span className="hidden truncate text-sm text-muted-foreground sm:block">
-                    {destination}
-                  </span>
-                  <span className="metric font-mono text-sm font-semibold">
-                    {clicks}
-                  </span>
-                </div>
+                  <h3 className="text-[19px] font-semibold">{t(title)}</h3>
+                  <p className="text-[15px] leading-[23px] text-pretty text-muted-foreground">
+                    {t(description)}
+                  </p>
+                </article>
               ))}
             </div>
           </div>
+        </section>
 
-          <svg
-            aria-hidden="true"
-            className="my-4 h-24 w-full overflow-visible"
-            viewBox="0 0 680 96"
-            fill="none"
-          >
-            <path
-              className="routing-path"
-              pathLength="1"
-              d="M18 48H236C286 48 288 16 340 16H446C496 16 496 80 550 80H662"
-              stroke="var(--primary)"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
-            <circle cx="18" cy="48" r="7" fill="var(--signal)" />
-            <circle cx="662" cy="80" r="7" fill="var(--primary)" />
-          </svg>
-
-          <div className="route-arrival grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
-            <div className="rounded-2xl bg-primary p-5 text-primary-foreground shadow-sm">
-              <p className="text-xs font-medium opacity-75">
-                {t("latestRoute")}
-              </p>
-              <p className="mt-2 font-mono text-xl font-semibold">
-                sho.rt/brief
-              </p>
-            </div>
-            <div className="flex items-center gap-3 rounded-2xl bg-secondary p-4 text-secondary-foreground">
-              <span className="signal-dot size-2 rounded-full" />
-              <div>
-                <p className="metric font-mono text-lg font-semibold">16,944</p>
-                <p className="text-xs opacity-70">{t("totalClicks")}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="product" className="content-auto border-y bg-card">
-        <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:py-32">
-          <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr]">
-            <h2 className="max-w-[12ch] text-4xl font-semibold tracking-[-0.035em] text-balance sm:text-5xl">
-              {t("landingFeatures")}
-            </h2>
-            <div>
-              <p className="max-w-[62ch] text-lg leading-8 text-pretty text-muted-foreground">
-                {t("landingFeaturesDescription")}
-              </p>
-              <div className="mt-8 divide-y">
-                {features.map(([title, description, Icon]) => (
-                  <article
-                    className="grid gap-4 py-7 first:pt-0 last:pb-0 sm:grid-cols-[auto_1fr] sm:gap-6"
-                    key={title}
-                  >
-                    <Icon className="mt-1 text-primary" aria-hidden="true" />
-                    <div>
-                      <h3 className="text-xl font-semibold">{t(title)}</h3>
-                      <p className="mt-2 max-w-[65ch] leading-7 text-pretty text-muted-foreground">
-                        {t(description)}
-                      </p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="workflow"
-        className="content-auto mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:py-32"
-      >
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-24">
-          <div>
-            <h2 className="text-4xl font-semibold tracking-[-0.035em] text-balance">
+        <section
+          id="workflow"
+          className="content-auto mx-auto grid max-w-[1440px] items-center gap-12 px-5 py-24 sm:px-8 lg:grid-cols-2 lg:gap-20 lg:px-20"
+        >
+          <div className="flex flex-col gap-5">
+            <p className="text-[13px] font-bold tracking-[0.09em] text-primary uppercase">
+              {t("forDevelopers")}
+            </p>
+            <h2 className="text-4xl font-bold tracking-[-0.03em] text-balance lg:text-[44px] lg:leading-[48px]">
               {t("sameProduct")}
             </h2>
-            <p className="mt-5 max-w-[60ch] text-lg leading-8 text-pretty text-muted-foreground">
+            <p className="max-w-[60ch] text-lg leading-[27px] text-pretty text-muted-foreground">
               {t("sameProductDescription")}
             </p>
+            <ul className="flex flex-col gap-3 pt-2">
+              {developerChecks.map((key) => (
+                <li className="flex items-center gap-3" key={key}>
+                  <CheckIcon aria-hidden="true" className="size-[18px]" />
+                  {t(key)}
+                </li>
+              ))}
+            </ul>
           </div>
-          <pre
-            aria-label={t("exploreApi")}
-            className="overflow-x-auto rounded-2xl bg-foreground p-6 font-mono text-sm leading-7 text-background shadow-xl"
-          >
-            <code>{`curl -X POST ${apiUrl}/v1/links \\
+          <figure className="min-w-0 overflow-hidden rounded-[20px] bg-foreground text-background shadow-[0_20px_40px_rgb(0_0_0/0.15)] dark:bg-muted dark:text-foreground">
+            <figcaption className="flex items-center gap-2 border-b border-background/10 px-5 py-4 font-mono text-[13px] text-background/60 dark:border-foreground/10 dark:text-foreground/60">
+              <span aria-hidden="true" className="flex gap-2 pr-3">
+                <span className="size-3 rounded-full bg-background/25 dark:bg-foreground/25" />
+                <span className="size-3 rounded-full bg-background/25 dark:bg-foreground/25" />
+                <span className="size-3 rounded-full bg-background/25 dark:bg-foreground/25" />
+              </span>
+              create-link.sh
+            </figcaption>
+            <pre className="overflow-x-auto px-7 pt-6 pb-7 font-mono text-sm leading-[25px]">
+              <code>
+                {`curl -X POST ${apiUrl}/v1/links \\
   -H "x-api-key: $CORTO_API_KEY" \\
   -H "content-type: application/json" \\
-  -d '{"url":"https://example.com/brief"}'`}</code>
-          </pre>
-        </div>
-      </section>
+  -d '{"url":"https://example.com/brief"}'`}
+                <span className="mt-4 block opacity-60">{`→ 201 { "link": { "shortUrl": "${appUrl}/…" } }`}</span>
+              </code>
+            </pre>
+          </figure>
+        </section>
 
-      <section className="content-auto bg-foreground text-background">
-        <div className="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-24 sm:px-8 lg:flex-row lg:items-end lg:justify-between lg:py-28">
-          <div>
-            <h2 className="max-w-[13ch] text-4xl font-semibold tracking-[-0.035em] text-balance sm:text-5xl">
+        <section className="content-auto mx-auto max-w-[1440px] px-5 pb-24 sm:px-8 lg:px-20">
+          <div className="flex flex-col items-start gap-5 rounded-3xl bg-primary px-8 py-16 text-primary-foreground sm:px-16 lg:min-h-[440px] lg:justify-center">
+            <h2 className="max-w-[13ch] text-4xl font-bold tracking-[-0.03em] text-balance sm:text-[52px] sm:leading-[55px]">
               {t("nextLinkReady")}
             </h2>
-            <p className="mt-5 text-lg text-background/70">
+            <p className="max-w-[440px] text-lg leading-[26px] text-primary-foreground/85">
               {t("nextLinkDescription")}
             </p>
+            <Link
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "h-auto rounded-[10px] bg-background px-6 py-3.5 text-base text-foreground hover:bg-background/90"
+              )}
+              href="/register"
+            >
+              {t("openDashboard")}
+              <ArrowRightIcon aria-hidden="true" data-icon="inline-end" />
+            </Link>
           </div>
-          <Link
-            className={buttonVariants({ size: "lg", variant: "secondary" })}
-            href="/register"
-          >
-            {t("openDashboard")}
-            <ArrowRightIcon data-icon="inline-end" />
-          </Link>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      <footer className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-8">
-        <Brand />
-        <div className="flex gap-5">
-          <Link className="hover:text-foreground" href="/docs">
-            {t("publicDocs")}
-          </Link>
-          <Link className="hover:text-foreground" href="/login">
-            {t("signIn")}
-          </Link>
-          <a
-            className="hover:text-foreground"
-            href={repositoryUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            GitHub
-          </a>
+      <footer className="border-t border-border-soft bg-muted">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-10 px-5 pt-12 pb-8 sm:px-8 lg:px-20">
+          <div className="grid gap-10 sm:grid-cols-3 sm:gap-6">
+            {footerColumns.map(([heading, links]) => (
+              <nav
+                aria-label={t(heading)}
+                className="flex flex-col items-start gap-3.5 text-[15px]"
+                key={heading}
+              >
+                <h2 className="font-semibold">{t(heading)}</h2>
+                {links.map(([href, label]) =>
+                  href.startsWith("/") ? (
+                    <Link
+                      className="text-muted-foreground hover:text-foreground"
+                      href={href}
+                      key={label}
+                    >
+                      {label}
+                    </Link>
+                  ) : (
+                    <a
+                      className="text-muted-foreground hover:text-foreground"
+                      href={href}
+                      key={label}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      {label}
+                    </a>
+                  )
+                )}
+              </nav>
+            ))}
+          </div>
+          <div className="flex flex-col gap-4 border-t border-border pt-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+            <p>{t("copyright", { year: new Date().getFullYear() })}</p>
+            <LanguageSwitcher />
+          </div>
         </div>
       </footer>
-    </main>
+    </>
   )
 }

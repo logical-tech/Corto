@@ -7,20 +7,12 @@ import {
   AlertTitle,
 } from "@workspace/ui/components/alert"
 import { Button } from "@workspace/ui/components/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
-import { Label } from "@workspace/ui/components/label"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Spinner } from "@workspace/ui/components/spinner"
 import { toast } from "@workspace/ui/components/toast"
+import { cn } from "@workspace/ui/lib/utils"
 import {
-  CheckCircle2Icon,
   CopyIcon,
   KeyRoundIcon,
   LockKeyholeIcon,
@@ -35,12 +27,69 @@ import { formatDate } from "@/lib/format"
 import { authClient, usePasskeyEnabled } from "@/lib/auth-client"
 
 type TwoFactorEnrollment = { totpURI: string; backupCodes: string[] }
+type OpenRow = "name" | "password" | "twoFactor" | null
+
+const darkButton = "bg-foreground text-background hover:bg-foreground/85"
+
+function Row({
+  id,
+  title,
+  description,
+  action,
+  children,
+}: {
+  id?: string
+  title: string
+  description: React.ReactNode
+  action?: React.ReactNode
+  children?: React.ReactNode
+}) {
+  return (
+    <div id={id} className="scroll-mt-24 border-b border-border-soft py-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-col gap-1">
+          <h3 className="font-medium">{title}</h3>
+          <div className="text-sm text-muted-foreground">{description}</div>
+        </div>
+        {action}
+      </div>
+      {children}
+    </div>
+  )
+}
+
+function RowAction(props: React.ComponentProps<typeof Button>) {
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      {...props}
+      className={cn("-mr-3 -mt-1.5 text-[15px] font-semibold", props.className)}
+    />
+  )
+}
+
+function FloatingField({
+  label,
+  ...props
+}: { label: string } & React.ComponentProps<"input">) {
+  return (
+    <label className="flex flex-col gap-0.5 rounded-[10px] border border-border px-3.5 py-2.5 transition-[border-color,box-shadow] focus-within:border-foreground focus-within:ring-1 focus-within:ring-foreground has-aria-invalid:border-destructive">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <input
+        {...props}
+        className="w-full bg-transparent text-base outline-none placeholder:text-subtle-foreground"
+      />
+    </label>
+  )
+}
 
 export default function AccountPage() {
   const { t, i18n } = useTranslation("settings")
   const { t: common } = useTranslation("common")
   const client = useQueryClient()
   const { data: session, isPending } = authClient.useSession()
+  const [openRow, setOpenRow] = useState<OpenRow>(null)
   const [name, setName] = useState<string | null>(null)
   const [password, setPassword] = useState("")
   const [disablePassword, setDisablePassword] = useState("")
@@ -69,7 +118,11 @@ export default function AccountPage() {
       })
       if (response.error) throw new Error(response.error.message)
     },
-    onSuccess: () => toast.add({ title: t("profileUpdated"), type: "success" }),
+    onSuccess: () => {
+      setOpenRow(null)
+      setName(null)
+      toast.add({ title: t("profileUpdated"), type: "success" })
+    },
   })
 
   const changePassword = useMutation({
@@ -85,6 +138,7 @@ export default function AccountPage() {
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
+      setOpenRow(null)
       toast.add({ title: t("passwordUpdated"), type: "success" })
     },
   })
@@ -109,6 +163,7 @@ export default function AccountPage() {
     onSuccess: () => {
       setEnrollment(null)
       setCode("")
+      setOpenRow(null)
       toast.add({ title: t("twoFactorEnabled"), type: "success" })
     },
   })
@@ -122,6 +177,7 @@ export default function AccountPage() {
     },
     onSuccess: () => {
       setDisablePassword("")
+      setOpenRow(null)
       toast.add({ title: t("twoFactorDisabled"), type: "success" })
     },
   })
@@ -174,88 +230,161 @@ export default function AccountPage() {
     currentPassword.length > 0 &&
     newPassword.length >= 8 &&
     newPassword === confirmPassword
+  const twoFactorOn = Boolean(session.user.twoFactorEnabled)
+  const passkeyCount = passkeys.data?.length ?? 0
+  const securityMax = passkeyEnabled ? 3 : 2
+  const securityScore =
+    1 + (twoFactorOn ? 1 : 0) + (passkeyEnabled && passkeyCount ? 1 : 0)
+  const securityLevel =
+    securityScore === securityMax
+      ? t("securityHigh")
+      : securityScore === 1
+        ? t("securityLow")
+        : t("securityMedium")
+  const securityHint = !twoFactorOn
+    ? passkeyEnabled && !passkeyCount
+      ? t("securityHintBoth")
+      : t("securityHintTwoFactor")
+    : passkeyEnabled && !passkeyCount
+      ? t("securityHintPasskey")
+      : t("securityHintDone")
+
+  function toggle(row: Exclude<OpenRow, null>) {
+    setOpenRow((current) => (current === row ? null : row))
+  }
+
+  function openTwoFactor() {
+    setOpenRow("twoFactor")
+    document
+      .getElementById("two-factor")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold tracking-[-0.03em]">
-          {common("account")}
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
+      <header className="flex flex-col gap-1.5">
+        <h1 className="text-[32px] leading-tight font-bold tracking-[-0.6px]">
+          {t("loginSecurity")}
         </h1>
-        <p className="max-w-2xl text-muted-foreground">
+        <p className="max-w-2xl text-base text-muted-foreground">
           {t("accountDescription")}
         </p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("profile")}</CardTitle>
-            <CardDescription>{t("profileDescription")}</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <Input
-              value={profileName}
-              autoComplete="name"
-              aria-label={t("profileName")}
-              onChange={(event) => setName(event.target.value)}
-            />
-            <p className="text-sm text-muted-foreground">
-              {session.user.email}
-            </p>
-            <Button
-              className="w-fit"
-              disabled={
-                updateProfile.isPending || profileName.trim().length < 2
-              }
-              onClick={() => updateProfile.mutate()}
+      <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_360px] xl:gap-18">
+        <div className="flex min-w-0 flex-col">
+          <div className="flex items-center gap-5 pb-8">
+            <div
+              aria-hidden
+              className="flex size-16 shrink-0 items-center justify-center rounded-full bg-foreground text-2xl font-semibold text-background uppercase sm:size-22 sm:text-4xl"
             >
-              {updateProfile.isPending ? (
-                <Spinner data-icon="inline-start" />
-              ) : null}
-              {common("saveChanges")}
-            </Button>
-          </CardContent>
-        </Card>
+              {session.user.name.charAt(0)}
+            </div>
+            <div className="flex min-w-0 flex-col gap-1">
+              <p className="truncate text-2xl font-bold">{session.user.name}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="truncate text-[15px] text-muted-foreground">
+                  {session.user.email}
+                </span>
+                {session.user.role === "admin" ? (
+                  <span className="rounded-full bg-muted px-2 py-[3px] text-xs font-semibold">
+                    {t("admin")}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("password")}</CardTitle>
-            <CardDescription>{t("passwordDescription")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form
-              className="flex flex-col gap-4"
-              onSubmit={(event) => {
-                event.preventDefault()
-                if (canChangePassword) changePassword.mutate()
-              }}
-            >
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="current-password">
-                  {t("passwordRequired")}
-                </Label>
+          <h2 className="text-[22px] font-semibold">{t("personalInfo")}</h2>
+          <Row
+            title={t("fullName")}
+            description={session.user.name}
+            action={
+              <RowAction
+                aria-expanded={openRow === "name"}
+                onClick={() => {
+                  setName(null)
+                  toggle("name")
+                }}
+              >
+                {openRow === "name" ? common("cancel") : t("edit")}
+              </RowAction>
+            }
+          >
+            {openRow === "name" ? (
+              <form
+                className="flex flex-col gap-3 pt-4 sm:flex-row"
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  if (profileName.trim().length >= 2) updateProfile.mutate()
+                }}
+              >
                 <Input
-                  id="current-password"
+                  value={profileName}
+                  autoComplete="name"
+                  aria-label={t("profileName")}
+                  autoFocus
+                  onChange={(event) => setName(event.target.value)}
+                />
+                <Button
+                  type="submit"
+                  className={cn("h-11 px-6", darkButton)}
+                  disabled={
+                    updateProfile.isPending || profileName.trim().length < 2
+                  }
+                >
+                  {updateProfile.isPending ? (
+                    <Spinner data-icon="inline-start" />
+                  ) : null}
+                  {common("saveChanges")}
+                </Button>
+              </form>
+            ) : null}
+          </Row>
+          <Row
+            title={t("emailAddress")}
+            description={t("emailUsedToSignIn", { email: session.user.email })}
+          />
+
+          <h2 className="pt-10 text-[22px] font-semibold">{t("login")}</h2>
+          <Row
+            title={t("password")}
+            description={t("passwordDescription")}
+            action={
+              <RowAction
+                aria-expanded={openRow === "password"}
+                onClick={() => toggle("password")}
+              >
+                {openRow === "password" ? common("cancel") : t("update")}
+              </RowAction>
+            }
+          >
+            {openRow === "password" ? (
+              <form
+                className="flex flex-col gap-3 pt-4 sm:pr-16"
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  if (canChangePassword) changePassword.mutate()
+                }}
+              >
+                <FloatingField
+                  label={t("passwordRequired")}
                   type="password"
                   autoComplete="current-password"
+                  autoFocus
                   value={currentPassword}
                   onChange={(event) => setCurrentPassword(event.target.value)}
                 />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="new-password">{t("newPassword")}</Label>
-                <Input
-                  id="new-password"
+                <FloatingField
+                  label={t("newPassword")}
                   type="password"
                   autoComplete="new-password"
+                  minLength={8}
                   value={newPassword}
                   onChange={(event) => setNewPassword(event.target.value)}
                 />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="confirm-password">{t("confirmPassword")}</Label>
-                <Input
-                  id="confirm-password"
+                <FloatingField
+                  label={t("confirmPassword")}
                   type="password"
                   autoComplete="new-password"
                   aria-invalid={passwordMismatch}
@@ -267,239 +396,337 @@ export default function AccountPage() {
                     {t("passwordMismatch")}
                   </p>
                 ) : null}
-              </div>
-              <Button
-                type="submit"
-                className="w-fit"
-                disabled={!canChangePassword}
-              >
-                {changePassword.isPending ? (
-                  <Spinner data-icon="inline-start" />
-                ) : (
-                  <LockKeyholeIcon data-icon="inline-start" />
-                )}
-                {t("changePassword")}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("twoFactorAuthentication")}</CardTitle>
-            <CardDescription>{t("twoFactorDescription")}</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            {session.user.twoFactorEnabled ? (
-              <>
-                <div className="flex items-center gap-3 rounded-2xl bg-primary/10 p-3 text-sm text-primary">
-                  <ShieldCheckIcon className="size-5" />
-                  {t("twoFactorEnabled")}
-                </div>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <Input
-                    value={disablePassword}
-                    type="password"
-                    autoComplete="current-password"
-                    placeholder={t("passwordRequired")}
-                    aria-label={t("passwordRequired")}
-                    onChange={(event) => setDisablePassword(event.target.value)}
-                  />
-                  <Button
-                    variant="outline"
-                    disabled={disableTwoFactor.isPending || !disablePassword}
-                    onClick={() => disableTwoFactor.mutate()}
-                  >
-                    {disableTwoFactor.isPending ? (
-                      <Spinner data-icon="inline-start" />
-                    ) : null}
-                    {t("disableTwoFactor")}
-                  </Button>
-                </div>
-              </>
-            ) : enrollment ? (
-              <div className="flex flex-col gap-4">
-                <div className="rounded-2xl bg-muted p-4">
-                  <p className="font-medium">{t("setupKey")}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {t("setupKeyDescription")}
-                  </p>
-                  <code className="mt-3 block rounded-xl bg-background px-3 py-2 text-xs break-all">
-                    {setupKey}
-                  </code>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        void navigator.clipboard.writeText(setupKey)
-                      }
-                    >
-                      <CopyIcon data-icon="inline-start" />
-                      {common("copy")}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      render={<a href={enrollment.totpURI} />}
-                    >
-                      {t("openAuthenticator")}
-                    </Button>
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-dashed p-4">
-                  <p className="font-medium">{t("recoveryCodes")}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {t("recoveryCodesDescription")}
-                  </p>
-                  <code className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-5">
-                    {enrollment.backupCodes.map((backupCode) => (
-                      <span key={backupCode}>{backupCode}</span>
-                    ))}
-                  </code>
-                  <Button
-                    className="mt-3"
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      void navigator.clipboard.writeText(
-                        enrollment.backupCodes.join("\n")
-                      )
-                    }
-                  >
-                    <CopyIcon data-icon="inline-start" />
-                    {t("copyRecoveryCodes")}
-                  </Button>
-                </div>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <Input
-                    value={code}
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    placeholder={t("verificationCode")}
-                    aria-label={t("verificationCode")}
-                    onChange={(event) =>
-                      setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
-                    }
-                  />
-                  <Button
-                    disabled={verifyTwoFactor.isPending || code.length !== 6}
-                    onClick={() => verifyTwoFactor.mutate()}
-                  >
-                    {verifyTwoFactor.isPending ? (
-                      <Spinner data-icon="inline-start" />
-                    ) : null}
-                    {t("verifyAndEnable")}
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                <Input
-                  value={password}
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder={t("passwordRequired")}
-                  aria-label={t("passwordRequired")}
-                  onChange={(event) => setPassword(event.target.value)}
-                />
                 <Button
-                  className="w-fit"
-                  disabled={setupTwoFactor.isPending || !password}
-                  onClick={() => setupTwoFactor.mutate()}
+                  type="submit"
+                  size="lg"
+                  className={cn("w-fit px-6", darkButton)}
+                  disabled={!canChangePassword}
                 >
-                  {setupTwoFactor.isPending ? (
+                  {changePassword.isPending ? (
                     <Spinner data-icon="inline-start" />
                   ) : null}
-                  {t("setUpTwoFactor")}
+                  {t("changePassword")}
                 </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+              </form>
+            ) : null}
+          </Row>
 
-      <Card>
-        <CardHeader className="flex-row items-start justify-between gap-4">
-          <div className="space-y-1.5">
-            <CardTitle>{t("passkeys")}</CardTitle>
-            <CardDescription>{t("passkeysDescription")}</CardDescription>
-          </div>
-          {passkeyEnabled ? (
-            <Button
-              disabled={addPasskey.isPending}
-              onClick={() => addPasskey.mutate()}
-            >
-              {addPasskey.isPending ? (
-                <Spinner data-icon="inline-start" />
-              ) : (
-                <KeyRoundIcon data-icon="inline-start" />
-              )}
-              {t("addPasskey")}
-            </Button>
-          ) : null}
-        </CardHeader>
-        <CardContent>
-          {!passkeyEnabled ? (
-            <Alert>
-              <TriangleAlertIcon />
-              <AlertTitle>{t("passkeysUnavailable")}</AlertTitle>
-              <AlertDescription>
-                {t("passkeysUnavailableDescription")}
-              </AlertDescription>
-            </Alert>
-          ) : passkeys.isPending ? (
-            <Skeleton className="h-16 w-full" />
-          ) : passkeys.isError ? (
-            <Alert variant="destructive">
+          <Row
+            id="two-factor"
+            title={t("twoFactorAuthentication")}
+            description={`${twoFactorOn ? t("statusOn") : t("statusOff")} · ${t("twoFactorDescription")}`}
+            action={
+              <RowAction
+                aria-expanded={openRow === "twoFactor"}
+                onClick={() => toggle("twoFactor")}
+              >
+                {openRow === "twoFactor"
+                  ? common("cancel")
+                  : twoFactorOn
+                    ? t("disableTwoFactor")
+                    : t("setUp")}
+              </RowAction>
+            }
+          >
+            {openRow === "twoFactor" ? (
+              <div className="pt-4 sm:pr-16">
+                {twoFactorOn ? (
+                  <form
+                    className="flex flex-col gap-3 sm:flex-row"
+                    onSubmit={(event) => {
+                      event.preventDefault()
+                      if (disablePassword) disableTwoFactor.mutate()
+                    }}
+                  >
+                    <Input
+                      value={disablePassword}
+                      type="password"
+                      autoComplete="current-password"
+                      autoFocus
+                      placeholder={t("passwordRequired")}
+                      aria-label={t("passwordRequired")}
+                      onChange={(event) =>
+                        setDisablePassword(event.target.value)
+                      }
+                    />
+                    <Button
+                      type="submit"
+                      variant="outline"
+                      className="h-11"
+                      disabled={disableTwoFactor.isPending || !disablePassword}
+                    >
+                      {disableTwoFactor.isPending ? (
+                        <Spinner data-icon="inline-start" />
+                      ) : null}
+                      {t("disableTwoFactor")}
+                    </Button>
+                  </form>
+                ) : enrollment ? (
+                  <div className="flex flex-col gap-4">
+                    <div className="rounded-2xl bg-muted p-4">
+                      <p className="font-medium">{t("setupKey")}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {t("setupKeyDescription")}
+                      </p>
+                      <code className="mt-3 block rounded-xl bg-background px-3 py-2 text-xs break-all">
+                        {setupKey}
+                      </code>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            void navigator.clipboard.writeText(setupKey)
+                          }
+                        >
+                          <CopyIcon data-icon="inline-start" />
+                          {common("copy")}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          render={<a href={enrollment.totpURI} />}
+                        >
+                          {t("openAuthenticator")}
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-dashed p-4">
+                      <p className="font-medium">{t("recoveryCodes")}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {t("recoveryCodesDescription")}
+                      </p>
+                      <code className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-5">
+                        {enrollment.backupCodes.map((backupCode) => (
+                          <span key={backupCode}>{backupCode}</span>
+                        ))}
+                      </code>
+                      <Button
+                        className="mt-3"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          void navigator.clipboard.writeText(
+                            enrollment.backupCodes.join("\n")
+                          )
+                        }
+                      >
+                        <CopyIcon data-icon="inline-start" />
+                        {t("copyRecoveryCodes")}
+                      </Button>
+                    </div>
+                    <form
+                      className="flex flex-col gap-3 sm:flex-row"
+                      onSubmit={(event) => {
+                        event.preventDefault()
+                        if (code.length === 6) verifyTwoFactor.mutate()
+                      }}
+                    >
+                      <Input
+                        value={code}
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        placeholder={t("verificationCode")}
+                        aria-label={t("verificationCode")}
+                        onChange={(event) =>
+                          setCode(
+                            event.target.value.replace(/\D/g, "").slice(0, 6)
+                          )
+                        }
+                      />
+                      <Button
+                        type="submit"
+                        className={cn("h-11 px-6", darkButton)}
+                        disabled={verifyTwoFactor.isPending || code.length !== 6}
+                      >
+                        {verifyTwoFactor.isPending ? (
+                          <Spinner data-icon="inline-start" />
+                        ) : null}
+                        {t("verifyAndEnable")}
+                      </Button>
+                    </form>
+                  </div>
+                ) : (
+                  <form
+                    className="flex flex-col gap-3 sm:flex-row"
+                    onSubmit={(event) => {
+                      event.preventDefault()
+                      if (password) setupTwoFactor.mutate()
+                    }}
+                  >
+                    <Input
+                      value={password}
+                      type="password"
+                      autoComplete="current-password"
+                      autoFocus
+                      placeholder={t("passwordRequired")}
+                      aria-label={t("passwordRequired")}
+                      onChange={(event) => setPassword(event.target.value)}
+                    />
+                    <Button
+                      type="submit"
+                      className={cn("h-11 px-6", darkButton)}
+                      disabled={setupTwoFactor.isPending || !password}
+                    >
+                      {setupTwoFactor.isPending ? (
+                        <Spinner data-icon="inline-start" />
+                      ) : null}
+                      {t("setUpTwoFactor")}
+                    </Button>
+                  </form>
+                )}
+              </div>
+            ) : null}
+          </Row>
+
+          <Row
+            title={t("passkeys")}
+            description={
+              !passkeyEnabled
+                ? t("passkeysUnavailableDescription")
+                : passkeyCount
+                  ? `${t("passkeyCount", { count: passkeyCount })} · ${t("passkeysDescription")}`
+                  : `${t("noPasskeysYet")} · ${t("passkeysDescription")}`
+            }
+            action={
+              passkeyEnabled ? (
+                <RowAction
+                  disabled={addPasskey.isPending}
+                  onClick={() => addPasskey.mutate()}
+                >
+                  {addPasskey.isPending ? (
+                    <Spinner data-icon="inline-start" />
+                  ) : null}
+                  {t("addPasskey")}
+                </RowAction>
+              ) : null
+            }
+          >
+            {passkeyEnabled && passkeys.isPending ? (
+              <Skeleton className="mt-4 h-14 w-full" />
+            ) : null}
+            {passkeyEnabled && passkeys.isError ? (
+              <Alert variant="destructive" className="mt-4">
+                <TriangleAlertIcon />
+                <AlertTitle>{common("pageLoadError")}</AlertTitle>
+                <AlertDescription>{passkeys.error.message}</AlertDescription>
+              </Alert>
+            ) : null}
+            {passkeyEnabled && passkeys.data?.length ? (
+              <ul className="mt-4 divide-y divide-border-soft rounded-xl border border-border">
+                {passkeys.data.map((passkey) => (
+                  <li
+                    key={passkey.id}
+                    className="flex items-center gap-3 py-2 pr-2 pl-4"
+                  >
+                    <KeyRoundIcon className="size-4 text-muted-foreground" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">
+                        {passkey.name || t("passkey")}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {formatDate(
+                          passkey.createdAt.toISOString(),
+                          i18n.resolvedLanguage
+                        )}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={t("removePasskey")}
+                      disabled={removePasskey.isPending}
+                      onClick={() => removePasskey.mutate(passkey.id)}
+                    >
+                      <Trash2Icon />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </Row>
+
+          {mutationError ? (
+            <Alert variant="destructive" className="mt-6">
               <TriangleAlertIcon />
               <AlertTitle>{common("pageLoadError")}</AlertTitle>
-              <AlertDescription>{passkeys.error.message}</AlertDescription>
+              <AlertDescription>{mutationError.message}</AlertDescription>
             </Alert>
-          ) : passkeys.data?.length ? (
-            <div className="divide-y rounded-2xl border">
-              {passkeys.data.map((passkey) => (
-                <div key={passkey.id} className="flex items-center gap-3 p-4">
-                  <KeyRoundIcon className="size-4 text-muted-foreground" />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">
-                      {passkey.name || t("passkey")}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {formatDate(
-                        passkey.createdAt.toISOString(),
-                        i18n.resolvedLanguage
-                      )}
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={t("removePasskey")}
-                    disabled={removePasskey.isPending}
-                    onClick={() => removePasskey.mutate(passkey.id)}
-                  >
-                    <Trash2Icon />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex items-center gap-3 rounded-2xl bg-muted p-4 text-sm text-muted-foreground">
-              <CheckCircle2Icon className="size-5" />
-              {t("noPasskeys")}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          ) : null}
+        </div>
 
-      {mutationError ? (
-        <Alert variant="destructive">
-          <TriangleAlertIcon />
-          <AlertTitle>{common("pageLoadError")}</AlertTitle>
-          <AlertDescription>{mutationError.message}</AlertDescription>
-        </Alert>
-      ) : null}
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-0">
+          <section className="flex flex-col gap-4 rounded-2xl border border-border p-7">
+            <ShieldCheckIcon
+              aria-hidden
+              className="size-10 text-primary"
+              strokeWidth={1.5}
+            />
+            <h2 className="text-xl leading-[25px] font-semibold">
+              {securityScore === securityMax
+                ? t("securityDoneTitle")
+                : t("securityTitle")}
+            </h2>
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">
+                  {t("securityLevel")}
+                </span>
+                <span className="font-semibold">{securityLevel}</span>
+              </div>
+              <div
+                role="meter"
+                aria-label={t("securityLevel")}
+                aria-valuemin={0}
+                aria-valuemax={securityMax}
+                aria-valuenow={securityScore}
+                aria-valuetext={securityLevel}
+                className="flex gap-1"
+              >
+                {Array.from({ length: securityMax }, (_, index) => (
+                  <span
+                    key={index}
+                    className={cn(
+                      "h-1.5 flex-1 rounded-[3px]",
+                      index < securityScore ? "bg-primary" : "bg-border-soft"
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
+            <p className="text-sm leading-5 text-muted-foreground">
+              {securityHint}
+            </p>
+            {!twoFactorOn ? (
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full border-foreground font-semibold"
+                onClick={openTwoFactor}
+              >
+                {t("setUpTwoFactor")}
+              </Button>
+            ) : passkeyEnabled && !passkeyCount ? (
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full border-foreground font-semibold"
+                disabled={addPasskey.isPending}
+                onClick={() => addPasskey.mutate()}
+              >
+                {t("addPasskey")}
+              </Button>
+            ) : null}
+          </section>
+          <section className="flex flex-col gap-2.5 rounded-2xl bg-muted p-7">
+            <LockKeyholeIcon aria-hidden className="size-7" strokeWidth={1.5} />
+            <h2 className="font-semibold">{t("changeableTitle")}</h2>
+            <p className="text-sm leading-5 text-muted-foreground">
+              {t("changeableDescription")}
+            </p>
+          </section>
+        </aside>
+      </div>
     </div>
   )
 }

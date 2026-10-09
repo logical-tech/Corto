@@ -52,5 +52,12 @@
   "openLink": "Abrir {{link}}",
   "signIn": "Iniciar sesión",
   "signUp": "Crear cuenta",
-  "getStarted": "empezar"
+  "getStarted": "empezar",
+  "findLink": "Buscar un enlace",
+  "searchHint": "Busca por slug, título o destino",
+  "search": "Buscar",
+  "accountMenu": "Menú de la cuenta",
+  "toggleSidebar": "Mostrar u ocultar barra lateral",
+  "selfHosted": "Autoalojado y abierto",
+  "selfHostedDescription": "Tus enlaces, tus datos. Corto se ejecuta en tu propia infraestructura."
 }
