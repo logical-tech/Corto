@@ -43,6 +43,13 @@
       "when": 1787054632128,
       "tag": "0005_yummy_silver_surfer",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791570890508,
+      "tag": "0006_api_key_rate_limit",
+      "breakpoints": true
     }
   ]
 }

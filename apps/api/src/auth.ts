@@ -82,6 +82,8 @@ export const authOptions = {
   plugins: [
     apiKey({
       references: "user",
+      // The plugin default (10 requests/day) makes keys unusable for the API and MCP.
+      rateLimit: { timeWindow: 60_000, maxRequests: 120 },
       permissions: {
         defaultPermissions: { links: ["read", "write"] },
       },
