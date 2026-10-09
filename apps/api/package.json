@@ -17,6 +17,7 @@
     "@better-auth/passkey": "1.6.29",
     "@better-auth/redis-storage": "^1.6.29",
     "@hono/zod-validator": "^0.9.0",
+    "@modelcontextprotocol/sdk": "1.32.1",
     "better-auth": "^1.6.29",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.13.2",

@@ -72,6 +72,12 @@ curl -X POST "$NEXT_PUBLIC_APP_URL/api/v1/links" \
 
 Advertising is configured per link owner through `GET` and `PATCH /api/v1/advertising`. AdsTerra accepts a supported banner preset plus either the `invoke.js` URL or the entire copied snippet. By default, the interstitial runs its countdown and then reveals **Continue to site**; `automaticRedirect: true` redirects when it ends. `adFree: true` excludes one link.
 
+An MCP server (Streamable HTTP, stateless) at `/api/mcp` exposes the same link, analytics, and advertising operations as tools. It authenticates with an API key in `x-api-key` or `Authorization: Bearer`:
+
+```bash
+claude mcp add --transport http corto "$NEXT_PUBLIC_APP_URL/api/mcp" --header "x-api-key: $CORTO_API_KEY"
+```
+
 Verify the service without authentication:
 
 ```bash

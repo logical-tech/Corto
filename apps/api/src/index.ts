@@ -13,7 +13,7 @@ app.use(
   "*",
   cors({
     origin: env.CORS_ORIGINS,
-    allowHeaders: ["Content-Type", "x-api-key"],
+    allowHeaders: ["Content-Type", "x-api-key", "Authorization", "mcp-protocol-version"],
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
   }),

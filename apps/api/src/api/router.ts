@@ -1,5 +1,6 @@
 import { Hono } from "hono"
 import { auth } from "../auth"
+import { mcpHandler } from "../mcp"
 import { openapi } from "../openapi"
 import { analyticsRouter } from "./routers/analytics"
 import { advertisingRouter } from "./routers/advertising"
@@ -20,3 +21,4 @@ apiRouter.get("/health", (c) => c.json({ status: "ok" }))
 apiRouter.get("/openapi.json", (c) => c.json(openapi))
 apiRouter.all("/auth/*", (c) => auth.handler(c.req.raw))
 apiRouter.route("/v1", v1)
+apiRouter.all("/mcp", mcpHandler((path, init) => v1.request(path, init)))

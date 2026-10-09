@@ -290,4 +290,10 @@ describe("public contract", () => {
 
     expect((await app.request("/v1/links")).status).toBe(404)
   })
+
+  test("rejects MCP requests without an API key", async () => {
+    const { app } = await import("./index")
+    const res = await app.request("/api/mcp", { method: "POST" })
+    expect(res.status).toBe(401)
+  })
 })
