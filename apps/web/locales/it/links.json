@@ -151,5 +151,11 @@
   "doneEditing": "Fatto",
   "goalToGo": "Mancano {{remaining}}",
   "deleteThisLink": "Elimina questo link",
-  "linkLive": "Attivo"
+  "linkLive": "Attivo",
+  "resetStats": "Azzera statistiche",
+  "resetStatsQuestion": "Azzerare le statistiche di questo link?",
+  "resetStatsWarning": "I clic tornano a 0, lo storico dei clic viene eliminato e gli obiettivi dovranno essere raggiunti di nuovo. L’operazione non può essere annullata.",
+  "resetStatsConfirm": "Azzera",
+  "statsReset": "Statistiche azzerate",
+  "statsNotReset": "Le statistiche non sono state azzerate"
 }

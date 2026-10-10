@@ -151,5 +151,11 @@
   "doneEditing": "Fertig",
   "goalToGo": "Noch {{remaining}}",
   "deleteThisLink": "Diesen Link löschen",
-  "linkLive": "Live"
+  "linkLive": "Live",
+  "resetStats": "Statistiken zurücksetzen",
+  "resetStatsQuestion": "Statistiken dieses Links zurücksetzen?",
+  "resetStatsWarning": "Die Klicks werden auf 0 gesetzt, der Klickverlauf wird gelöscht und Ziele müssen erneut erreicht werden. Dies kann nicht rückgängig gemacht werden.",
+  "resetStatsConfirm": "Auf 0 zurücksetzen",
+  "statsReset": "Statistiken zurückgesetzt",
+  "statsNotReset": "Die Statistiken wurden nicht zurückgesetzt"
 }

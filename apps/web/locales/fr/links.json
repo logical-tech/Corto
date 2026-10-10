@@ -151,5 +151,11 @@
   "doneEditing": "Terminé",
   "goalToGo": "Encore {{remaining}}",
   "deleteThisLink": "Supprimer ce lien",
-  "linkLive": "En ligne"
+  "linkLive": "En ligne",
+  "resetStats": "Réinitialiser les statistiques",
+  "resetStatsQuestion": "Réinitialiser les statistiques de ce lien ?",
+  "resetStatsWarning": "Les clics repassent à 0, l’historique des clics est supprimé et les objectifs devront être atteints à nouveau. Cette action est irréversible.",
+  "resetStatsConfirm": "Remettre à 0",
+  "statsReset": "Statistiques réinitialisées",
+  "statsNotReset": "Les statistiques n’ont pas été réinitialisées"
 }

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto"
 import { and, desc, eq } from "drizzle-orm"
 import { db } from "../../db"
-import { shortLinks } from "../../db/schema"
+import { linkClicks, linkGoals, shortLinks } from "../../db/schema"
 import { redis, redisKey } from "../../redis"
 import type { CreateLinkInput, UpdateLinkInput } from "../../schemas"
 import { iso } from "../presenters"
@@ -130,6 +130,23 @@ export const deleteOwnedLink = async (id: string, userId: string) => {
   if (row) await dropCachedLink(row.slug)
   return Boolean(row)
 }
+
+export const resetOwnedLinkStats = (id: string, userId: string) =>
+  db.transaction(async (tx) => {
+    const [row] = await tx
+      .update(shortLinks)
+      .set({ clicks: 0, lastClickedAt: null, updatedAt: new Date() })
+      .where(and(eq(shortLinks.id, id), eq(shortLinks.userId, userId)))
+      .returning()
+    if (!row) return null
+    await tx.delete(linkClicks).where(eq(linkClicks.linkId, id))
+    // Goals stay configured but must be reached again.
+    await tx
+      .update(linkGoals)
+      .set({ reachedAt: null })
+      .where(eq(linkGoals.linkId, id))
+    return row
+  })
 
 export type RedirectLink = {
   id: string

@@ -151,5 +151,11 @@
   "doneEditing": "Done",
   "goalToGo": "{{remaining}} to go",
   "deleteThisLink": "Delete this link",
-  "linkLive": "Live"
+  "linkLive": "Live",
+  "resetStats": "Reset stats",
+  "resetStatsQuestion": "Reset this link's stats?",
+  "resetStatsWarning": "Clicks go back to 0, the click history is deleted and goals must be reached again. This cannot be undone.",
+  "resetStatsConfirm": "Reset to 0",
+  "statsReset": "Stats reset",
+  "statsNotReset": "The stats were not reset"
 }

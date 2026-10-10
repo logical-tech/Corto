@@ -5,6 +5,7 @@ import {
   deleteLinkController,
   getLinkController,
   listLinksController,
+  resetLinkStatsController,
   updateLinkController,
   updateLinkGoalsController,
 } from "../controllers/links";
@@ -57,6 +58,9 @@ export const linksRouter = new Hono<AppEnv>()
           )
     ),
     (c) => updateLinkGoalsController(c, c.req.param("id"), c.req.valid("json"))
+  )
+  .post("/:id/reset-stats", requireAuth("write"), (c) =>
+    resetLinkStatsController(c, c.req.param("id"))
   )
   .patch(
     "/:id",

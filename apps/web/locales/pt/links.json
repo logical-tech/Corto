@@ -151,5 +151,11 @@
   "doneEditing": "Concluído",
   "goalToGo": "Faltam {{remaining}}",
   "deleteThisLink": "Eliminar este link",
-  "linkLive": "Ativo"
+  "linkLive": "Ativo",
+  "resetStats": "Redefinir estatísticas",
+  "resetStatsQuestion": "Redefinir as estatísticas deste link?",
+  "resetStatsWarning": "Os cliques voltam a 0, o histórico de cliques é excluído e as metas terão de ser atingidas novamente. Esta ação não pode ser desfeita.",
+  "resetStatsConfirm": "Redefinir para 0",
+  "statsReset": "Estatísticas redefinidas",
+  "statsNotReset": "As estatísticas não foram redefinidas"
 }

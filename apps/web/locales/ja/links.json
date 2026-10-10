@@ -151,5 +151,11 @@
   "doneEditing": "完了",
   "goalToGo": "あと {{remaining}}",
   "deleteThisLink": "このリンクを削除",
-  "linkLive": "公開中"
+  "linkLive": "公開中",
+  "resetStats": "統計をリセット",
+  "resetStatsQuestion": "このリンクの統計をリセットしますか？",
+  "resetStatsWarning": "クリック数が0に戻り、クリック履歴が削除され、目標は再度達成する必要があります。この操作は元に戻せません。",
+  "resetStatsConfirm": "0にリセット",
+  "statsReset": "統計をリセットしました",
+  "statsNotReset": "統計をリセットできませんでした"
 }

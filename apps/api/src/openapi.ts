@@ -183,6 +183,14 @@ export const openapi = {
         responses: { "200": { description: "Updated milestones" } },
       },
     },
+    "/v1/links/{id}/reset-stats": {
+      parameters: idParameter,
+      post: {
+        summary: "Reset a link's click count, click history and reached goals",
+        security,
+        responses: { "200": { description: "Link with zeroed stats" } },
+      },
+    },
     "/v1/advertising": {
       get: {
         summary:

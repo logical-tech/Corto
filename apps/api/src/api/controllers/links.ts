@@ -12,6 +12,7 @@ import {
   deleteOwnedLink,
   getOwnedLink,
   listLinks,
+  resetOwnedLinkStats,
   updateOwnedLink,
 } from "../handlers/links";
 import { presentLink } from "../presenters";
@@ -67,5 +68,15 @@ export const deleteLinkController = async (c: Context<AppEnv>, id: string) => {
   const deleted = await deleteOwnedLink(id, c.var.principal.userId);
   return deleted
     ? c.body(null, 204)
+    : c.json({ message: "Link not found" }, 404);
+};
+
+export const resetLinkStatsController = async (
+  c: Context<AppEnv>,
+  id: string
+) => {
+  const link = await resetOwnedLinkStats(id, c.var.principal.userId);
+  return link
+    ? c.json({ link: presentLink(link) })
     : c.json({ message: "Link not found" }, 404);
 };

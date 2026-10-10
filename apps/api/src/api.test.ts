@@ -278,6 +278,7 @@ describe("public contract", () => {
     const { app } = await import("./index")
     const health = await app.request("/api/health")
     expect(health.status).toBe(200)
+    expect(openapi.paths).toHaveProperty("/v1/links/{id}/reset-stats")
     expect(await health.json()).toEqual({ status: "ok" })
 
     const spec = await app.request("/api/openapi.json")

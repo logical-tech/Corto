@@ -103,6 +103,15 @@ const createServer = (v1: V1Request, apiKey: string) => {
     ({ id }) => call("DELETE", linkPath(id))
   )
   server.registerTool(
+    "reset_link_stats",
+    {
+      description: "Reset a link's clicks to 0: deletes its click history and un-reaches its goals.",
+      inputSchema: { id },
+      annotations: { destructiveHint: true },
+    },
+    ({ id }) => call("POST", linkPath(id, "/reset-stats"))
+  )
+  server.registerTool(
     "set_link_goals",
     {
       description: "Replace the click milestones (goals) of a link.",

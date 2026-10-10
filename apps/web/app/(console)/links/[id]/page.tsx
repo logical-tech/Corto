@@ -66,6 +66,7 @@ import {
   MegaphoneIcon,
   MousePointerClickIcon,
   PlusIcon,
+  RotateCcwIcon,
   Share2Icon,
   Trash2Icon,
   TriangleAlertIcon,
@@ -146,6 +147,20 @@ export default function LinkDetailPage() {
       await client.invalidateQueries({ queryKey: ["links"], exact: true })
       toast.add({ title: t("linkDeleted"), type: "success" })
       router.replace("/links")
+    },
+  })
+  const resetStats = useMutation({
+    mutationFn: () =>
+      api<{ link: ShortLink }>(`/v1/links/${id}/reset-stats`, {
+        method: "POST",
+      }),
+    onSuccess: async () => {
+      setRecentClicksPage(1)
+      await Promise.all([
+        client.invalidateQueries({ queryKey: ["links"] }),
+        client.invalidateQueries({ queryKey: ["analytics"] }),
+      ])
+      toast.add({ title: t("statsReset"), type: "success" })
     },
   })
   const updateGoals = useMutation({
@@ -946,6 +961,45 @@ export default function LinkDetailPage() {
                 <Button
                   variant="ghost"
                   className="mx-auto mt-3 h-12 font-semibold text-muted-foreground hover:text-destructive"
+                />
+              }
+            >
+              <RotateCcwIcon data-icon="inline-start" />
+              {t("resetStats")}
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("resetStatsQuestion")}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t("resetStatsWarning")}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                <AlertDialogAction
+                  variant="destructive"
+                  disabled={resetStats.isPending}
+                  onClick={() => resetStats.mutate()}
+                >
+                  {t("resetStatsConfirm")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          {resetStats.isError ? (
+            <Alert variant="destructive">
+              <TriangleAlertIcon />
+              <AlertTitle>{t("statsNotReset")}</AlertTitle>
+              <AlertDescription>{resetStats.error.message}</AlertDescription>
+            </Alert>
+          ) : null}
+
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  className="mx-auto h-12 font-semibold text-muted-foreground hover:text-destructive"
                 />
               }
             >

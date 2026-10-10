@@ -151,5 +151,11 @@
   "doneEditing": "完成",
   "goalToGo": "还差 {{remaining}}",
   "deleteThisLink": "删除此链接",
-  "linkLive": "运行中"
+  "linkLive": "运行中",
+  "resetStats": "重置统计",
+  "resetStatsQuestion": "要重置此链接的统计吗？",
+  "resetStatsWarning": "点击数将归零，点击记录将被删除，目标需要重新达成。此操作无法撤销。",
+  "resetStatsConfirm": "重置为 0",
+  "statsReset": "统计已重置",
+  "statsNotReset": "统计未能重置"
 }
