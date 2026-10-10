@@ -50,6 +50,13 @@
       "when": 1791570890508,
       "tag": "0006_api_key_rate_limit",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791589109684,
+      "tag": "0007_visitor_key",
+      "breakpoints": true
     }
   ]
 }

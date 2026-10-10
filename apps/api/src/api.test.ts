@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { account, shortLinks, user } from "./db/schema"
 import { renderAdvertisingPage } from "./api/handlers/advertising-page"
 import { renderPasswordPage } from "./api/handlers/password-page"
+import { isBot, normalizeIp, visitorKey } from "./api/handlers/visitor"
 import {
   createApiKeySchema,
   createLinkSchema,
@@ -218,6 +219,56 @@ describe("public contract", () => {
     )
   })
 
+  test("keys unique visitors per link without merging distinct browsers", () => {
+    const chrome = {
+      "user-agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+      "accept-language": "it-IT,it;q=0.9",
+      "sec-ch-ua-platform": '"macOS"',
+      "sec-fetch-mode": "navigate",
+    } as Record<string, string>
+    const from = (headers: Record<string, string>) => (name: string) =>
+      headers[name]
+    const key = (linkId: string, ip: string, headers = chrome) =>
+      visitorKey("secret", linkId, ip, from(headers))
+
+    expect(key("a", "1.2.3.4")).toBe(key("a", "::ffff:1.2.3.4"))
+    expect(key("a", "2001:db8:1:2:aaaa::1")).toBe(key("a", "2001:db8:1:2:bbbb::9"))
+    expect(key("a", "2001:db8:1:2::1")).not.toBe(key("a", "2001:db8:1:3::1"))
+    expect(key("a", "1.2.3.4")).not.toBe(key("b", "1.2.3.4"))
+    expect(key("a", "1.2.3.4")).not.toBe(key("a", "1.2.3.5"))
+    expect(key("a", "1.2.3.4")).not.toBe(
+      key("a", "1.2.3.4", { ...chrome, "accept-language": "en-US" })
+    )
+    expect(normalizeIp("2001:db8::1")).toBe("2001:0db8:0000:0000::/64")
+
+    expect(isBot(from(chrome), "GET", true)).toBe(false)
+    expect(isBot(from({ ...chrome, "sec-fetch-mode": "" }), "GET", true)).toBe(true)
+    expect(isBot(from({ ...chrome, "sec-fetch-mode": "" }), "GET", false)).toBe(false)
+    expect(isBot(from(chrome), "HEAD", true)).toBe(true)
+    expect(isBot(from({}), "GET", true)).toBe(true)
+    for (const userAgent of [
+      "WhatsApp/2.23.20.0 A",
+      "TelegramBot (like TwitterBot)",
+      "Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)",
+      "facebookexternalhit/1.1",
+      "curl/8.7.1",
+      "python-requests/2.32.3",
+    ]) {
+      expect(isBot(from({ "user-agent": userAgent }), "GET", true)).toBe(true)
+    }
+    expect(
+      isBot(
+        from({
+          "user-agent":
+            "Mozilla/5.0 (Linux; Android 10; CUBOT X30) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36",
+        }),
+        "GET",
+        true
+      )
+    ).toBe(false)
+  })
+
   test("publishes the documented routes", () => {
     expect(openapi.servers).toEqual([{ url: "/api" }])
     expect(openapi.paths).toHaveProperty("/v1/links")
@@ -227,6 +278,7 @@ describe("public contract", () => {
     expect(openapi.paths).toHaveProperty("/v1/settings")
     expect(openapi.paths).toHaveProperty("/v1/advertising")
     expect(openapi.paths).toHaveProperty("/v1/links/{id}/goals")
+    expect(openapi.paths).toHaveProperty("/v1/links/{id}/reset-stats")
     expect(openapi.components.securitySchemes.apiKey.name).toBe("x-api-key")
   })
 
@@ -278,7 +330,6 @@ describe("public contract", () => {
     const { app } = await import("./index")
     const health = await app.request("/api/health")
     expect(health.status).toBe(200)
-    expect(openapi.paths).toHaveProperty("/v1/links/{id}/reset-stats")
     expect(await health.json()).toEqual({ status: "ok" })
 
     const spec = await app.request("/api/openapi.json")

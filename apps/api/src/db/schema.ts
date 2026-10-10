@@ -225,6 +225,8 @@ export const linkClicks = pgTable(
       .defaultNow()
       .notNull(),
     ipHash: varchar("ip_hash", { length: 64 }).notNull(),
+    visitorKey: varchar("visitor_key", { length: 64 }),
+    bot: boolean("bot").default(false).notNull(),
     referrer: text("referrer"),
     userAgent: text("user_agent"),
     country: varchar("country", { length: 2 }),

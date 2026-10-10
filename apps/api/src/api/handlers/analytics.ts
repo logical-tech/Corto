@@ -1,7 +1,6 @@
 import {
   and,
   count,
-  countDistinct,
   desc,
   eq,
   gte,
@@ -19,7 +18,8 @@ export const getLinkAnalytics = async (
   { page = 1, pageSize = 10, country, device }: Partial<RecentClicksQuery> = {}
 ) => {
   const referrer = sql<string>`coalesce(nullif(${linkClicks.referrer}, ''), 'Direct')`;
-  const recentClickConditions = [eq(linkClicks.linkId, id)];
+  const human = and(eq(linkClicks.linkId, id), eq(linkClicks.bot, false));
+  const recentClickConditions = [human];
   if (country) recentClickConditions.push(eq(linkClicks.country, country));
   if (device) recentClickConditions.push(eq(linkClicks.device, device));
   const recentClickWhere = and(...recentClickConditions);
@@ -35,36 +35,37 @@ export const getLinkAnalytics = async (
     db
       .select({
         clicks: count(),
-        uniqueVisitors: countDistinct(linkClicks.ipHash),
+        // Clicks recorded before visitor keys existed fall back to the IP hash.
+        uniqueVisitors: sql<number>`count(distinct coalesce(${linkClicks.visitorKey}, ${linkClicks.ipHash}))`,
         clicksLast30Days: sql<number>`count(*) filter (where ${linkClicks.clickedAt} >= now() - interval '30 days')`,
       })
       .from(linkClicks)
-      .where(eq(linkClicks.linkId, id)),
+      .where(human),
     db.execute(sql`
         SELECT to_char(day, 'YYYY-MM-DD') AS date, count(c.id)::int AS clicks
         FROM generate_series(current_date - 29, current_date, interval '1 day') day
-        LEFT JOIN link_clicks c ON c.link_id = ${id}
+        LEFT JOIN link_clicks c ON c.link_id = ${id} AND NOT c.bot
           AND c.clicked_at >= day AND c.clicked_at < day + interval '1 day'
         GROUP BY day ORDER BY day
       `),
     db
       .select({ referrer, clicks: count() })
       .from(linkClicks)
-      .where(eq(linkClicks.linkId, id))
+      .where(human)
       .groupBy(referrer)
       .orderBy(desc(count()))
       .limit(10),
     db
       .select({ country: linkClicks.country, clicks: count() })
       .from(linkClicks)
-      .where(and(eq(linkClicks.linkId, id), isNotNull(linkClicks.country)))
+      .where(and(human, isNotNull(linkClicks.country)))
       .groupBy(linkClicks.country)
       .orderBy(desc(count()))
       .limit(10),
     db
       .select({ device: linkClicks.device, clicks: count() })
       .from(linkClicks)
-      .where(eq(linkClicks.linkId, id))
+      .where(human)
       .groupBy(linkClicks.device)
       .orderBy(desc(count())),
     db
@@ -132,6 +133,7 @@ export const getAnalyticsSummary = async (userId: string) => {
       .where(
         and(
           eq(shortLinks.userId, userId),
+          eq(linkClicks.bot, false),
           gte(linkClicks.clickedAt, sql`now() - interval '30 days'`),
         ),
       ),
@@ -139,7 +141,7 @@ export const getAnalyticsSummary = async (userId: string) => {
       SELECT to_char(day, 'YYYY-MM-DD') AS date, count(c.id)::int AS clicks
       FROM generate_series(current_date - 29, current_date, interval '1 day') day
       LEFT JOIN short_links l ON l.user_id = ${userId}
-      LEFT JOIN link_clicks c ON c.link_id = l.id
+      LEFT JOIN link_clicks c ON c.link_id = l.id AND NOT c.bot
         AND c.clicked_at >= day AND c.clicked_at < day + interval '1 day'
       GROUP BY day ORDER BY day
     `),

@@ -10,6 +10,7 @@ import {
 } from "../handlers/advertising-page"
 import { resolveRedirect, verifyLinkPassword } from "../handlers/links"
 import { renderPasswordPage } from "../handlers/password-page"
+import { isBot, visitorKey } from "../handlers/visitor"
 import { redis, redisKey } from "../../redis"
 import type { AppEnv } from "../types"
 
@@ -83,14 +84,16 @@ export const redirectController = async (c: Context<AppEnv>, slug: string) => {
     return c.json({ message: "Link not found" }, 404)
   }
 
+  const header = (name: string) => c.req.header(name)
   const userAgent = (c.req.header("user-agent") ?? "").slice(0, 500)
   const countryHeader = env.TRUST_PROXY
     ? c.req.header("cf-ipcountry")?.toUpperCase()
     : undefined
   const country =
     countryHeader && /^[A-Z]{2}$/.test(countryHeader) ? countryHeader : null
+  const ip = requestIp(c)
   const ipHash = createHmac("sha256", env.IP_HASH_SECRET)
-    .update(requestIp(c))
+    .update(ip)
     .digest("hex")
 
   if (link.hasPassword) {
@@ -106,6 +109,13 @@ export const redirectController = async (c: Context<AppEnv>, slug: string) => {
   void recordClick({
     linkId: link.id,
     ipHash,
+    visitorKey: visitorKey(env.IP_HASH_SECRET, link.id, ip, header),
+    bot: isBot(
+      header,
+      c.req.method,
+      header("x-forwarded-proto") === "https" ||
+        new URL(c.req.url).protocol === "https:"
+    ),
     referrer: c.req.header("referer")?.slice(0, 2048) ?? null,
     userAgent: userAgent || null,
     country,

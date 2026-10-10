@@ -7,6 +7,8 @@ import { notifyGoalMilestones } from "./notifications"
 type ClickInput = {
   linkId: string
   ipHash: string
+  visitorKey: string
+  bot: boolean
   referrer: string | null
   userAgent: string | null
   country: string | null
@@ -16,6 +18,8 @@ type ClickInput = {
 export const recordClick = async (input: ClickInput) => {
   const result = await db.transaction(async (tx) => {
     await tx.insert(linkClicks).values(input)
+    // Bot hits are kept for the record but never count as clicks.
+    if (input.bot) return null
     const [link] = await tx
       .update(shortLinks)
       .set({
